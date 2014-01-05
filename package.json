@@ -1,0 +1,31 @@
+{
+  "name": "js-sha512",
+  "version": "0.1.0",
+  "description": "This is a simple SHA-512, SHA-384, SHA-512/224, SHA-512/256 hash functions for JavaScript supports UTF-8 encoding.",
+  "main": "src/sha512.js",
+  "scripts": {
+    "test": "node tests/node-test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emn178/js-sha512.git"
+  },
+  "keywords": [
+    "sha",
+    "sha2",
+    "sha384",
+    "sha512",
+    "sha512/224",
+    "sha512/256",
+    "hash",
+    "encryption",
+    "cryptography",
+    "HMAC"
+  ],
+  "license": "MIT",
+  "author": "emn178 <emn178@gmail.com>",
+  "homepage": "https://github.com/emn178/js-sha512",
+  "bugs": {
+    "url": "https://github.com/emn178/js-sha512/issues"
+  }
+}
