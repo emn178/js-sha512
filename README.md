@@ -1,5 +1,5 @@
 # js-sha512
-This is a simple SHA-512, SHA-384, SHA-512/224, SHA-512/256 hash functions for JavaScript supports UTF-8 encoding.
+A simple SHA-512, SHA-384, SHA-512/224, SHA-512/256 hash functions for JavaScript supports UTF-8 encoding.
 
 ## Install
 For node.js, you can use this command to install:
