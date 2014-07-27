@@ -1,5 +1,5 @@
 /*
- * js-sha512 v0.1.0
+ * js-sha512 v0.1.1
  * https://github.com/emn178/js-sha512
  *
  * Copyright 2014, emn178@gmail.com
@@ -193,7 +193,7 @@
   var hasUTF8 = function(message) {
     var i = message.length;
     while(i--)
-      if(message.charCodeAt(i) > 255)
+      if(message.charCodeAt(i) > 127)
         return true;
     return false;
   };
