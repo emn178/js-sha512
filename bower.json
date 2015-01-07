@@ -1,7 +1,7 @@
 {
   "name": "js-sha512",
   "version": "0.1.2",
-  "main": ["build/sha256.min.js"],
+  "main": ["build/sha512.min.js"],
   "ignore": [
     "samples",
     "tests"
