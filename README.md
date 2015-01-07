@@ -1,12 +1,37 @@
 # js-sha512
+[![Build Status](https://api.travis-ci.org/emn178/js-sha512.png)](https://travis-ci.org/emn178/js-sha512)
+[![Build Status](https://coveralls.io/repos/emn178/js-sha512/badge.png?branch=master)](https://coveralls.io/r/emn178/js-sha512?branch=master)  
+[![NPM](https://nodei.co/npm/js-sha512.png?stars&downloads)](https://nodei.co/npm/js-sha512/)  
 A simple SHA-512, SHA-384, SHA-512/224, SHA-512/256 hash functions for JavaScript supports UTF-8 encoding.
 
-## Install
+## Demo
+[SHA512 Online](http://emn178.github.io/online-tools/sha512.html)  
+[SHA384 Online](http://emn178.github.io/online-tools/sha384.html)  
+[SHA512/256 Online](http://emn178.github.io/online-tools/sha512_256.html)  
+[SHA512/224 Online](http://emn178.github.io/online-tools/sha512_224.html)  
+
+## Download
+[Compress](https://raw.github.com/emn178/js-sha512/master/build/sha512.min.js)  
+[Uncompress](https://raw.github.com/emn178/js-sha512/master/src/sha512.js)
+
+## Installation
+You can also install js-sha512 by using Bower.
+
+    bower install js-sha512
+
 For node.js, you can use this command to install:
 
     npm install js-sha512
 
 ## Usage
+```
+You could use like this:
+```JavaScript
+sha512('Message to hash');
+sha384('Message to hash');
+sha512_256('Message to hash');
+sha512_224('Message to hash');
+```
 If you use node.js, you should require the module first:
 ```JavaScript
 sha512 = require('js-sha512');
@@ -17,14 +42,57 @@ sha512 = require('js-sha512').sha512;
 sha384 = require('js-sha512').sha384;
 sha512_256 = require('js-sha512').sha512_256;
 sha512_224 = require('js-sha512').sha512_224;
-```
-And you could use like this:
-```JavaScript
-sha512('Message to hash');
-sha384('Message to hash');
-sha512_256('Message to hash');
-sha512_224('Message to hash');
-```
+
+### Methods
+
+#### sha512(str, asciiOnly)
+
+Hash string to sha512, set asciiOnly to true for better performace if you ensure input is ascii.
+
+##### *str: `String`*
+
+String to hash.
+
+##### *asciiOnly: `Boolean` (default: `false`)*
+
+Specify the string encoding is ASCII.
+
+#### sha384(str, asciiOnly)
+
+Hash string to sha384, set asciiOnly to true for better performace if you ensure input is ascii.
+
+##### *str: `String`*
+
+String to hash.
+
+##### *asciiOnly: `Boolean` (default: `false`)*
+
+Specify the string encoding is ASCII.
+
+#### sha512_256(str, asciiOnly)
+
+Hash string to sha512/256, set asciiOnly to true for better performace if you ensure input is ascii.
+
+##### *str: `String`*
+
+String to hash.
+
+##### *asciiOnly: `Boolean` (default: `false`)*
+
+Specify the string encoding is ASCII.
+
+#### sha512_224(str, asciiOnly)
+
+Hash string to sha512/224, set asciiOnly to true for better performace if you ensure input is ascii.
+
+##### *str: `String`*
+
+String to hash.
+
+##### *asciiOnly: `Boolean` (default: `false`)*
+
+Specify the string encoding is ASCII.
+
 ## Example
 Code
 ```JavaScript
@@ -71,15 +139,6 @@ Output
     93422ceb8291a69b22f02dc1114c39a287493ad525dcebc77e4019a44eaee2633a85d0f29cd298ee6799048c33a4be0c
     b6dab29c16ec35ab34a5d92ff135b58de96741dda78b1009a2181cf8b45d2f72
     0f46a0ae7f226517dd66ece0ce1efa29ffb7ced05ac4566fdcaed188
-
-## Tests
-You can open `tests/index.html` in browser or use node.js to run test
-
-    node tests/node-test.js
-
-or
-
-    npm test
 
 ## Extensions
 ### jQuery
