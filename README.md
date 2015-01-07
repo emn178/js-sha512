@@ -24,7 +24,6 @@ For node.js, you can use this command to install:
     npm install js-sha512
 
 ## Usage
-```
 You could use like this:
 ```JavaScript
 sha512('Message to hash');
@@ -42,7 +41,7 @@ sha512 = require('js-sha512').sha512;
 sha384 = require('js-sha512').sha384;
 sha512_256 = require('js-sha512').sha512_256;
 sha512_224 = require('js-sha512').sha512_224;
-
+```
 ### Methods
 
 #### sha512(str, asciiOnly)
