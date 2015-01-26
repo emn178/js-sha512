@@ -20,6 +20,7 @@ describe('sha512', function() {
       it('should be successful', function() {
         expect(sha512('中文')).to.be('8b88efc2ebbcbdad5ac2d65af05bec57bda25e71fd5fb25bbd892057a2755fbd05d8d8491cb2946febd5b0f124ffdfbaecf7e34946353c4f1b5ab29545895468');
         expect(sha512('aécio')).to.be('e1c6925243db76985abacaf9fa85e22697f549e67f65a36c88e4046a2260990ff9eefc3402396ea8dcbe8c592d8d5671bea612156eda38d3708d394bbd17d493');
+        expect(sha512('𠜎')).to.be('f3e7ee9cdf7dbb52f7edd59ce3d49868c64f2b3aceceab060b8eaaebdf9de0dae5866d660e3319c5aad426a2176cb1703efc73eb24d1a90458ceda1b7f4e3940');
       });
     });
 
@@ -53,6 +54,7 @@ describe('sha384', function() {
       it('should be successful', function() {
         expect(sha384('中文')).to.be('93422ceb8291a69b22f02dc1114c39a287493ad525dcebc77e4019a44eaee2633a85d0f29cd298ee6799048c33a4be0c');
         expect(sha384('aécio')).to.be('a2146805faafc45b0055b49386768811c803ef9fa8a85b648e114276c1bf49ef1092ec1bc2d3f7e036238a97eace2087');
+        expect(sha384('𠜎')).to.be('e929475cf9b4d73e2a2366146381ac779b17499c92ddf910e028eb9f30280878a2843643ed8a539af5dffed64143b93d');
       });
     });
 
@@ -86,6 +88,7 @@ describe('sha512/256', function() {
       it('should be successful', function() {
         expect(sha512_256('中文')).to.be('b6dab29c16ec35ab34a5d92ff135b58de96741dda78b1009a2181cf8b45d2f72');
         expect(sha512_256('aécio')).to.be('122802ca08e39c2ef46f6a81379dc5683bd8aa074dfb54259f0add4d8b5504bc');
+        expect(sha512_256('𠜎')).to.be('1032308151c0f4f5f8d4e0d96956352eb8ff87da98df8878d8795a858a7e7c08');
       });
     });
 
@@ -119,6 +122,7 @@ describe('sha512/224', function() {
       it('should be successful', function() {
         expect(sha512_224('中文')).to.be('0f46a0ae7f226517dd66ece0ce1efa29ffb7ced05ac4566fdcaed188');
         expect(sha512_224('aécio')).to.be('562f2e4ee7f7451d20dcc6a0ac1a1e1c4a75f09baaf1cf19af3e15f4');
+        expect(sha512_224('𠜎')).to.be('0533318c52b3d4ad355c2a6c7e727ae3d2efa749db480ac33560b059');
       });
     });
 

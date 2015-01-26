@@ -1,3 +1,8 @@
+# v0.1.3 / 2015-01-26
+
+* Add test cases.
+* Improve performance.
+
 # v0.1.2 / 2015-01-07
 
 * Add bower package.

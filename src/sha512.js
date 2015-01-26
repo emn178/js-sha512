@@ -1,5 +1,5 @@
 /*
- * js-sha512 v0.1.2
+ * js-sha512 v0.1.3
  * https://github.com/emn178/js-sha512
  *
  * Copyright 2014-2015, emn178@gmail.com
@@ -10,11 +10,22 @@
 ;(function(root, undefined) {
   'use strict';
 
+  var NODE_JS = typeof(module) != 'undefined';
+  if(NODE_JS) {
+    root = global;
+  }
+  var HEX_CHARS = '0123456789abcdef'.split('');
+  var SHIFT = [24, 16, 8, 0];
+
   // Class Long
   var Long = function(high, low) {
     this.high = high << 0;
     this.low = low << 0;
   };
+
+  if(root.JS_SHA512_TEST) {
+    root.Long = Long;
+  }
 
   Long.prototype.and = function(other) {
     return new Long(this.high & other.high, this.low & other.low);
@@ -75,10 +86,15 @@
   };
 
   Long.prototype.toHexString = function() {
-    return toHexString(this.high) + toHexString(this.low);
+    return HEX_CHARS[(this.high >> 28) & 0x0F] + HEX_CHARS[(this.high >> 24) & 0x0F] +
+           HEX_CHARS[(this.high >> 20) & 0x0F] + HEX_CHARS[(this.high >> 16) & 0x0F] +
+           HEX_CHARS[(this.high >> 12) & 0x0F] + HEX_CHARS[(this.high >> 8) & 0x0F] +
+           HEX_CHARS[(this.high >> 4) & 0x0F] + HEX_CHARS[this.high & 0x0F] +
+           HEX_CHARS[(this.low >> 28) & 0x0F] + HEX_CHARS[(this.low >> 24) & 0x0F] +
+           HEX_CHARS[(this.low >> 20) & 0x0F] + HEX_CHARS[(this.low >> 16) & 0x0F] +
+           HEX_CHARS[(this.low >> 12) & 0x0F] + HEX_CHARS[(this.low >> 8) & 0x0F] +
+           HEX_CHARS[(this.low >> 4) & 0x0F] + HEX_CHARS[this.low & 0x0F];
   };
-
-  var HEX_CHARS = '0123456789abcdef'.split('');
 
   var K =[new Long(0x428A2F98, 0xD728AE22),  new Long(0x71374491, 0x23EF65CD),
           new Long(0xB5C0FBCF, 0xEC4D3B2F),  new Long(0xE9B5DBA5, 0x8189DBBC),
@@ -279,9 +295,9 @@
       blocks[i] = 0;
     }
     for(i = 0;i < length;++i) {
-      blocks[i >> 2] |= message.charCodeAt(i) << (3 - (i & 3) << 3);
+      blocks[i >> 2] |= message.charCodeAt(i) << SHIFT[i & 3];
     }
-    blocks[i >> 2] |= 0x80 << (3 - (i & 3) << 3);
+    blocks[i >> 2] |= 0x80 << SHIFT[i & 3];
     blocks[blockCount - 1] = length << 3; // length * 8
     var blocks64 = [];
     for(i = 0;i < blockCount;i += 2) {
@@ -300,9 +316,9 @@
       blocks[i] = 0;
     }
     for(i = 0;i < length;++i) {
-      blocks[i >> 2] |= bytes[i] << (3 - (i & 3) << 3);
+      blocks[i >> 2] |= bytes[i] << SHIFT[i & 3];
     }
-    blocks[i >> 2] |= 0x80 << (3 - (i & 3) << 3);
+    blocks[i >> 2] |= 0x80 << SHIFT[i & 3];
     blocks[blockCount - 1] = length << 3; // length * 8
     var blocks64 = [];
     for(i = 0;i < blockCount;i += 2) {
@@ -311,16 +327,7 @@
     return blocks64;
   };
 
-  var toHexString = function(num) {
-    var hex = '';
-    for(var i = 0; i < 4; i++) {
-      var offset = 3 - i << 3;
-      hex += HEX_CHARS[(num >> (offset + 4)) & 0x0F] + HEX_CHARS[(num >> offset) & 0x0F];
-    }
-    return hex;
-  };
-
-  if(typeof(module) != 'undefined') {
+  if(!root.JS_SHA512_TEST && NODE_JS) {
     sha512.sha512 = sha512;
     sha512.sha384 = sha384;
     sha512.sha512_256 = sha512_256;
