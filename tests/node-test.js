@@ -15,30 +15,3 @@ sha512_224 = null;
 JS_SHA512_TEST = true;
 require('../src/sha512.js');
 require('./test.js');
-
-describe('Long', function() {
-	var l = new Long(0xff, 0xff00);
-  describe('shiftRightUnsigned', function() {
-    it('should be not change', function() {
-      expect(l.shiftRightUnsigned(0).toHexString()).to.be('000000ff0000ff00');
-    });
-
-    it('should be equal to high', function() {
-      expect(l.shiftRightUnsigned(32).toHexString()).to.be('00000000000000ff');
-    });
-
-    it('should be sucessful', function() {
-      expect(l.shiftRightUnsigned(36).toHexString()).to.be('000000000000000f');
-    });
-  });
-
-  describe('rightRotate', function() {
-    it('should be not change', function() {
-      expect(l.rightRotate(0).toHexString()).to.be('000000ff0000ff00');
-    });
-
-    it('should exchange', function() {
-      expect(l.rightRotate(32).toHexString()).to.be('0000ff00000000ff');
-    });
-  });
-});
