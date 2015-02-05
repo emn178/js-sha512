@@ -154,38 +154,32 @@
     }
 
     for(var i = 0, length = blocks.length;i < length;i += 32) {
-      var w = [], s0h, s0l, s1h, s1l, th, tl, c1, c2, c3, c4, j, 
+      var w = [], s0h, s0l, s1h, s1l, c1, c2, c3, c4, j, 
           ah, al, bh, bl, ch, cl, dh, dl, eh, el, fh, fl, gh, gl, hh, hl,
           majh, majl, t1h, t1l, t2h, t2l, chh, chl;
       for(j = 0;j < 32;++j) {
         w[j] = blocks[i + j];
       }
       for(j = 32;j < 160;j += 2) {
-        th = w[j - 30];
-        tl = w[j - 29];
-        s0h = ((th >>> 1) | (tl << 31)) ^ ((th >>> 8) | (tl << 24)) ^ (th >>> 7);
-        s0l = ((tl >>> 1) | (th << 31)) ^ ((tl >>> 8) | (th << 24)) ^ ((tl >>> 7) | th << 25);
+        t1h = w[j - 30];
+        t1l = w[j - 29];
+        s0h = ((t1h >>> 1) | (t1l << 31)) ^ ((t1h >>> 8) | (t1l << 24)) ^ (t1h >>> 7);
+        s0l = ((t1l >>> 1) | (t1h << 31)) ^ ((t1l >>> 8) | (t1h << 24)) ^ ((t1l >>> 7) | t1h << 25);
 
-        th = w[j - 4];
-        tl = w[j - 3];
-        s1h = ((th >>> 19) | (tl << 13)) ^ ((tl >>> 29) | (th << 3)) ^ (th >>> 6);
-        s1l = ((tl >>> 19) | (th << 13)) ^ ((th >>> 29) | (tl << 3)) ^ ((tl >>> 6) | th << 26);
+        t1h = w[j - 4];
+        t1l = w[j - 3];
+        s1h = ((t1h >>> 19) | (t1l << 13)) ^ ((t1l >>> 29) | (t1h << 3)) ^ (t1h >>> 6);
+        s1l = ((t1l >>> 19) | (t1h << 13)) ^ ((t1h >>> 29) | (t1l << 3)) ^ ((t1l >>> 6) | t1h << 26);
 
-        th = w[j - 32];
-        tl = w[j - 31];
+        t1h = w[j - 32];
+        t1l = w[j - 31];
+        t2h = w[j - 14];
+        t2l = w[j - 13];
 
-        c1 = (tl & 0xFFFF) + (s0l & 0xFFFF) + (s1l & 0xFFFF);
-        c2 = (tl >>> 16) + (s0l >>> 16) + (s1l >>> 16);
-        c3 = (th & 0xFFFF) + (s0h & 0xFFFF) + (s1h & 0xFFFF);
-        c4 = (th >>> 16) + (s0h >>> 16) + (s1h >>> 16);
-
-        th = w[j - 14];
-        tl = w[j - 13];
-
-        c1 += (tl & 0xFFFF);
-        c2 += (tl >>> 16) + (c1 >>> 16);
-        c3 += (th & 0xFFFF) + (c2 >>> 16);
-        c4 += (th >>> 16) + (c3 >>> 16);
+        c1 = (t2l & 0xFFFF) + (t1l & 0xFFFF) + (s0l & 0xFFFF) + (s1l & 0xFFFF);
+        c2 = (t2l >>> 16) + (t1l >>> 16) + (s0l >>> 16) + (s1l >>> 16) + (c1 >>> 16);
+        c3 = (t2h & 0xFFFF) + (t1h & 0xFFFF) + (s0h & 0xFFFF) + (s1h & 0xFFFF) + (c2 >>> 16);
+        c4 = (t2h >>> 16) + (t1h >>> 16) + (s0h >>> 16) + (s1h >>> 16) + (c3 >>> 16);
 
         w[j] = (c4 << 16) | (c3 & 0xFFFF);
         w[j + 1] = (c2 << 16) | (c1 & 0xFFFF);
@@ -217,6 +211,22 @@
         majh = (ah & bh) ^ (ah & ch) ^ (bh & ch);
         majl = (al & bl) ^ (al & cl) ^ (bl & cl);
 
+        chh = (eh & fh) ^ (~eh & gh);
+        chl = (el & fl) ^ (~el & gl);
+
+        t1h = w[j];
+        t1l = w[j + 1];
+        t2h = K[j];
+        t2l = K[j + 1];
+
+        c1 = (t2l & 0xFFFF) + (t1l & 0xFFFF) + (chl & 0xFFFF) + (s1l & 0xFFFF) + (hl & 0xFFFF);
+        c2 = (t2l >>> 16) + (t1l >>> 16) + (chl >>> 16) + (s1l >>> 16) + (hl >>> 16) + (c1 >>> 16);
+        c3 = (t2h & 0xFFFF) + (t1h & 0xFFFF) + (chh & 0xFFFF) + (s1h & 0xFFFF) + (hh & 0xFFFF) + (c2 >>> 16);
+        c4 = (t2h >>> 16) + (t1h >>> 16) + (chh >>> 16) + (s1h >>> 16) + (hh >>> 16) + (c3 >>> 16);
+
+        t1h = (c4 << 16) | (c3 & 0xFFFF);
+        t1l = (c2 << 16) | (c1 & 0xFFFF);
+
         c1 = (majl & 0xFFFF) + (s0l & 0xFFFF);
         c2 = (majl >>> 16) + (s0l >>> 16) + (c1 >>> 16);
         c3 = (majh & 0xFFFF) + (s0h & 0xFFFF) + (c2 >>> 16);
@@ -224,28 +234,6 @@
 
         t2h = (c4 << 16) | (c3 & 0xFFFF);
         t2l = (c2 << 16) | (c1 & 0xFFFF);
-
-        chh = (eh & fh) ^ (~eh & gh);
-        chl = (el & fl) ^ (~el & gl);
-
-        th = w[j];
-        tl = w[j + 1];
-
-        c1 = (tl & 0xFFFF) + (chl & 0xFFFF) + (s1l & 0xFFFF) + (hl & 0xFFFF);
-        c2 = (tl >>> 16) + (chl >>> 16) + (s1l >>> 16) + (hl >>> 16);
-        c3 = (th & 0xFFFF) + (chh & 0xFFFF) + (s1h & 0xFFFF) + (hh & 0xFFFF);
-        c4 = (th >>> 16) + (chh >>> 16) + (s1h >>> 16) + (hh >>> 16);
-
-        th = K[j];
-        tl = K[j + 1];
-
-        c1 += (tl & 0xFFFF);
-        c2 += (tl >>> 16) + (c1 >>> 16);
-        c3 += (th & 0xFFFF) + (c2 >>> 16);
-        c4 += (th >>> 16) + (c3 >>> 16);
-
-        t1h = (c4 << 16) | (c3 & 0xFFFF);
-        t1l = (c2 << 16) | (c1 & 0xFFFF);
 
         hh = gh;
         hl = gl;
@@ -343,25 +331,78 @@
       h7l = (c2 << 16) | (c1 & 0xFFFF);
     }
 
-    var hex = toHexString(h0h) + toHexString(h0l) + toHexString(h1h) + toHexString(h1l) +
-              toHexString(h2h) + toHexString(h2l) + toHexString(h3h) + toHexString(h3l);
+    var hex = HEX_CHARS[(h0h >> 28) & 0x0F] + HEX_CHARS[(h0h >> 24) & 0x0F] +
+              HEX_CHARS[(h0h >> 20) & 0x0F] + HEX_CHARS[(h0h >> 16) & 0x0F] +
+              HEX_CHARS[(h0h >> 12) & 0x0F] + HEX_CHARS[(h0h >> 8) & 0x0F] +
+              HEX_CHARS[(h0h >> 4) & 0x0F] + HEX_CHARS[h0h & 0x0F] +
+              HEX_CHARS[(h0l >> 28) & 0x0F] + HEX_CHARS[(h0l >> 24) & 0x0F] +
+              HEX_CHARS[(h0l >> 20) & 0x0F] + HEX_CHARS[(h0l >> 16) & 0x0F] +
+              HEX_CHARS[(h0l >> 12) & 0x0F] + HEX_CHARS[(h0l >> 8) & 0x0F] +
+              HEX_CHARS[(h0l >> 4) & 0x0F] + HEX_CHARS[h0l & 0x0F] +
+              HEX_CHARS[(h1h >> 28) & 0x0F] + HEX_CHARS[(h1h >> 24) & 0x0F] +
+              HEX_CHARS[(h1h >> 20) & 0x0F] + HEX_CHARS[(h1h >> 16) & 0x0F] +
+              HEX_CHARS[(h1h >> 12) & 0x0F] + HEX_CHARS[(h1h >> 8) & 0x0F] +
+              HEX_CHARS[(h1h >> 4) & 0x0F] + HEX_CHARS[h1h & 0x0F] +
+              HEX_CHARS[(h1l >> 28) & 0x0F] + HEX_CHARS[(h1l >> 24) & 0x0F] +
+              HEX_CHARS[(h1l >> 20) & 0x0F] + HEX_CHARS[(h1l >> 16) & 0x0F] +
+              HEX_CHARS[(h1l >> 12) & 0x0F] + HEX_CHARS[(h1l >> 8) & 0x0F] +
+              HEX_CHARS[(h1l >> 4) & 0x0F] + HEX_CHARS[h1l & 0x0F] +
+              HEX_CHARS[(h2h >> 28) & 0x0F] + HEX_CHARS[(h2h >> 24) & 0x0F] +
+              HEX_CHARS[(h2h >> 20) & 0x0F] + HEX_CHARS[(h2h >> 16) & 0x0F] +
+              HEX_CHARS[(h2h >> 12) & 0x0F] + HEX_CHARS[(h2h >> 8) & 0x0F] +
+              HEX_CHARS[(h2h >> 4) & 0x0F] + HEX_CHARS[h2h & 0x0F] +
+              HEX_CHARS[(h2l >> 28) & 0x0F] + HEX_CHARS[(h2l >> 24) & 0x0F] +
+              HEX_CHARS[(h2l >> 20) & 0x0F] + HEX_CHARS[(h2l >> 16) & 0x0F] +
+              HEX_CHARS[(h2l >> 12) & 0x0F] + HEX_CHARS[(h2l >> 8) & 0x0F] +
+              HEX_CHARS[(h2l >> 4) & 0x0F] + HEX_CHARS[h2l & 0x0F] +
+              HEX_CHARS[(h3h >> 28) & 0x0F] + HEX_CHARS[(h3h >> 24) & 0x0F] +
+              HEX_CHARS[(h3h >> 20) & 0x0F] + HEX_CHARS[(h3h >> 16) & 0x0F] +
+              HEX_CHARS[(h3h >> 12) & 0x0F] + HEX_CHARS[(h3h >> 8) & 0x0F] +
+              HEX_CHARS[(h3h >> 4) & 0x0F] + HEX_CHARS[h3h & 0x0F] +
+              HEX_CHARS[(h3l >> 28) & 0x0F] + HEX_CHARS[(h3l >> 24) & 0x0F] +
+              HEX_CHARS[(h3l >> 20) & 0x0F] + HEX_CHARS[(h3l >> 16) & 0x0F] +
+              HEX_CHARS[(h3l >> 12) & 0x0F] + HEX_CHARS[(h3l >> 8) & 0x0F] +
+              HEX_CHARS[(h3l >> 4) & 0x0F] + HEX_CHARS[h3l & 0x0F];
     if(tbit == 224) {
       return hex.substr(0, hex.length - 8);
     }
     if(tbit >= 384) {
-      hex += toHexString(h4h) + toHexString(h4l) + toHexString(h5h) + toHexString(h5l);
+      hex += HEX_CHARS[(h4h >> 28) & 0x0F] + HEX_CHARS[(h4h >> 24) & 0x0F] +
+             HEX_CHARS[(h4h >> 20) & 0x0F] + HEX_CHARS[(h4h >> 16) & 0x0F] +
+             HEX_CHARS[(h4h >> 12) & 0x0F] + HEX_CHARS[(h4h >> 8) & 0x0F] +
+             HEX_CHARS[(h4h >> 4) & 0x0F] + HEX_CHARS[h4h & 0x0F] +
+             HEX_CHARS[(h4l >> 28) & 0x0F] + HEX_CHARS[(h4l >> 24) & 0x0F] +
+             HEX_CHARS[(h4l >> 20) & 0x0F] + HEX_CHARS[(h4l >> 16) & 0x0F] +
+             HEX_CHARS[(h4l >> 12) & 0x0F] + HEX_CHARS[(h4l >> 8) & 0x0F] +
+             HEX_CHARS[(h4l >> 4) & 0x0F] + HEX_CHARS[h4l & 0x0F] +
+             HEX_CHARS[(h5h >> 28) & 0x0F] + HEX_CHARS[(h5h >> 24) & 0x0F] +
+             HEX_CHARS[(h5h >> 20) & 0x0F] + HEX_CHARS[(h5h >> 16) & 0x0F] +
+             HEX_CHARS[(h5h >> 12) & 0x0F] + HEX_CHARS[(h5h >> 8) & 0x0F] +
+             HEX_CHARS[(h5h >> 4) & 0x0F] + HEX_CHARS[h5h & 0x0F] +
+             HEX_CHARS[(h5l >> 28) & 0x0F] + HEX_CHARS[(h5l >> 24) & 0x0F] +
+             HEX_CHARS[(h5l >> 20) & 0x0F] + HEX_CHARS[(h5l >> 16) & 0x0F] +
+             HEX_CHARS[(h5l >> 12) & 0x0F] + HEX_CHARS[(h5l >> 8) & 0x0F] +
+             HEX_CHARS[(h5l >> 4) & 0x0F] + HEX_CHARS[h5l & 0x0F];
     }
     if(tbit == 512) {
-      hex += toHexString(h6h) + toHexString(h6l) + toHexString(h7h) + toHexString(h7l);
+      hex += HEX_CHARS[(h6h >> 28) & 0x0F] + HEX_CHARS[(h6h >> 24) & 0x0F] +
+             HEX_CHARS[(h6h >> 20) & 0x0F] + HEX_CHARS[(h6h >> 16) & 0x0F] +
+             HEX_CHARS[(h6h >> 12) & 0x0F] + HEX_CHARS[(h6h >> 8) & 0x0F] +
+             HEX_CHARS[(h6h >> 4) & 0x0F] + HEX_CHARS[h6h & 0x0F] +
+             HEX_CHARS[(h6l >> 28) & 0x0F] + HEX_CHARS[(h6l >> 24) & 0x0F] +
+             HEX_CHARS[(h6l >> 20) & 0x0F] + HEX_CHARS[(h6l >> 16) & 0x0F] +
+             HEX_CHARS[(h6l >> 12) & 0x0F] + HEX_CHARS[(h6l >> 8) & 0x0F] +
+             HEX_CHARS[(h6l >> 4) & 0x0F] + HEX_CHARS[h6l & 0x0F] +
+             HEX_CHARS[(h7h >> 28) & 0x0F] + HEX_CHARS[(h7h >> 24) & 0x0F] +
+             HEX_CHARS[(h7h >> 20) & 0x0F] + HEX_CHARS[(h7h >> 16) & 0x0F] +
+             HEX_CHARS[(h7h >> 12) & 0x0F] + HEX_CHARS[(h7h >> 8) & 0x0F] +
+             HEX_CHARS[(h7h >> 4) & 0x0F] + HEX_CHARS[h7h & 0x0F] +
+             HEX_CHARS[(h7l >> 28) & 0x0F] + HEX_CHARS[(h7l >> 24) & 0x0F] +
+             HEX_CHARS[(h7l >> 20) & 0x0F] + HEX_CHARS[(h7l >> 16) & 0x0F] +
+             HEX_CHARS[(h7l >> 12) & 0x0F] + HEX_CHARS[(h7l >> 8) & 0x0F] +
+             HEX_CHARS[(h7l >> 4) & 0x0F] + HEX_CHARS[h7l & 0x0F];
     }
     return hex;
-  };
-
-  var toHexString = function(v) {
-    return HEX_CHARS[(v >> 28) & 0x0F] + HEX_CHARS[(v >> 24) & 0x0F] +
-           HEX_CHARS[(v >> 20) & 0x0F] + HEX_CHARS[(v >> 16) & 0x0F] +
-           HEX_CHARS[(v >> 12) & 0x0F] + HEX_CHARS[(v >> 8) & 0x0F] +
-           HEX_CHARS[(v >> 4) & 0x0F] + HEX_CHARS[v & 0x0F];
   };
 
   var getBytesFromUtf8 = function(str) {
