@@ -42,56 +42,6 @@ sha384 = require('js-sha512').sha384;
 sha512_256 = require('js-sha512').sha512_256;
 sha512_224 = require('js-sha512').sha512_224;
 ```
-### Methods
-
-#### sha512(str, asciiOnly)
-
-Hash string to sha512, set asciiOnly to true for better performace if you ensure input is ascii.
-
-##### *str: `String`*
-
-String to hash.
-
-##### *asciiOnly: `Boolean` (default: `false`)*
-
-Specify the string encoding is ASCII.
-
-#### sha384(str, asciiOnly)
-
-Hash string to sha384, set asciiOnly to true for better performace if you ensure input is ascii.
-
-##### *str: `String`*
-
-String to hash.
-
-##### *asciiOnly: `Boolean` (default: `false`)*
-
-Specify the string encoding is ASCII.
-
-#### sha512_256(str, asciiOnly)
-
-Hash string to sha512/256, set asciiOnly to true for better performace if you ensure input is ascii.
-
-##### *str: `String`*
-
-String to hash.
-
-##### *asciiOnly: `Boolean` (default: `false`)*
-
-Specify the string encoding is ASCII.
-
-#### sha512_224(str, asciiOnly)
-
-Hash string to sha512/224, set asciiOnly to true for better performace if you ensure input is ascii.
-
-##### *str: `String`*
-
-String to hash.
-
-##### *asciiOnly: `Boolean` (default: `false`)*
-
-Specify the string encoding is ASCII.
-
 ## Example
 Code
 ```JavaScript

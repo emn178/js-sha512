@@ -1,6 +1,6 @@
 {
   "name": "js-sha512",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": ["build/sha512.min.js"],
   "ignore": [
     "samples",

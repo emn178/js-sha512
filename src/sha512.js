@@ -1,5 +1,5 @@
 /*
- * js-sha512 v0.2.0
+ * js-sha512 v0.2.1
  * https://github.com/emn178/js-sha512
  *
  * Copyright 2014-2015, emn178@gmail.com
@@ -15,8 +15,8 @@
     root = global;
   }
   var HEX_CHARS = '0123456789abcdef'.split('');
+  var EXTRA = [-2147483648, 8388608, 32768, 128];
   var SHIFT = [24, 16, 8, 0];
-
   var K =[0x428A2F98, 0xD728AE22, 0x71374491, 0x23EF65CD,
           0xB5C0FBCF, 0xEC4D3B2F, 0xE9B5DBA5, 0x8189DBBC,
           0x3956C25B, 0xF348B538, 0x59F111F1, 0xB605D019,
@@ -58,6 +58,8 @@
           0x4CC5D4BE, 0xCB3E42B6, 0x597F299C, 0xFC657E2A,
           0x5FCB6FAB, 0x3AD6FAEC, 0x6C44198C, 0x4A475817];
 
+  var blocks = [];
+
   var sha512 = function(message, asciiOnly) {
     return sha2(message, 512, asciiOnly);
   };
@@ -75,13 +77,11 @@
   };
 
   var sha2 = function(message, tbit, asciiOnly) {
-    var blocks, h0h, h0l, h1h, h1l, h2h, h2l, h3h, h3l, 
-        h4h, h4l, h5h, h5l, h6h, h6l, h7h, h7l;
-    if(!asciiOnly && /[^\x00-\x7F]/.test(message)) {
-      blocks = getBlocksFromUtf8(message);
-    } else {
-      blocks = getBlocksFromAscii(message);
-    }
+    var h0h, h0l, h1h, h1l, h2h, h2l, h3h, h3l, 
+        h4h, h4l, h5h, h5l, h6h, h6l, h7h, h7l, block, code, end = false,
+        i, j, index = 0, start = 0, bytes = 0, length = message.length,
+        s0h, s0l, s1h, s1l, c1, c2, c3, c4, 
+        majh, majl, t1h, t1l, t2h, t2l, chh, chl;
 
     if(tbit == 512) {
       h0h = 0x6A09E667;
@@ -152,55 +152,74 @@
       h7h = 0x1112E6AD;
       h7l = 0x91D692A1;
     }
-
-    for(var i = 0, length = blocks.length;i < length;i += 32) {
-      var w = [], s0h, s0l, s1h, s1l, c1, c2, c3, c4, j, 
-          ah, al, bh, bl, ch, cl, dh, dl, eh, el, fh, fl, gh, gl, hh, hl,
-          majh, majl, t1h, t1l, t2h, t2l, chh, chl;
-      for(j = 0;j < 32;++j) {
-        w[j] = blocks[i + j];
+    block = 0;
+    do {
+      blocks[0] = block;
+      blocks[1] = blocks[2] = blocks[3] = blocks[4] = 
+      blocks[5] = blocks[6] = blocks[7] = blocks[8] = 
+      blocks[9] = blocks[10] = blocks[11] = blocks[12] = 
+      blocks[13] = blocks[14] = blocks[15] = blocks[16] = 
+      blocks[17] = blocks[18] = blocks[19] = blocks[20] =
+      blocks[21] = blocks[22] = blocks[23] = blocks[24] =
+      blocks[25] = blocks[26] = blocks[27] = blocks[28] =
+      blocks[29] = blocks[30] = blocks[31] = blocks[32] = 0;
+      for (i = start;index < length && i < 128; ++index) {
+        code = message.charCodeAt(index);
+        if (code < 0x80) {
+          blocks[i >> 2] |= code << SHIFT[i++ & 3];
+        } else if (code < 0x800) {
+          blocks[i >> 2] |= (0xc0 | (code >> 6)) << SHIFT[i++ & 3];
+          blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+        } else if (code < 0xd800 || code >= 0xe000) {
+          blocks[i >> 2] |= (0xe0 | (code >> 12)) << SHIFT[i++ & 3];
+          blocks[i >> 2] |= (0x80 | ((code >> 6) & 0x3f)) << SHIFT[i++ & 3];
+          blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+        } else {
+          code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
+          blocks[i >> 2] |= (0xf0 | (code >> 18)) << SHIFT[i++ & 3];
+          blocks[i >> 2] |= (0x80 | ((code >> 12) & 0x3f)) << SHIFT[i++ & 3];
+          blocks[i >> 2] |= (0x80 | ((code >> 6) & 0x3f)) << SHIFT[i++ & 3];
+          blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+        }
       }
+      bytes += i - start;
+      start = i - 128;
+      if(index == length) {
+        blocks[i >> 2] |= EXTRA[i & 3];
+        ++index;
+      }
+      block = blocks[32];
+      if(index > length && i < 112) {
+        blocks[31] = bytes << 3;
+        end = true;
+      }
+
       for(j = 32;j < 160;j += 2) {
-        t1h = w[j - 30];
-        t1l = w[j - 29];
+        t1h = blocks[j - 30];
+        t1l = blocks[j - 29];
         s0h = ((t1h >>> 1) | (t1l << 31)) ^ ((t1h >>> 8) | (t1l << 24)) ^ (t1h >>> 7);
         s0l = ((t1l >>> 1) | (t1h << 31)) ^ ((t1l >>> 8) | (t1h << 24)) ^ ((t1l >>> 7) | t1h << 25);
 
-        t1h = w[j - 4];
-        t1l = w[j - 3];
+        t1h = blocks[j - 4];
+        t1l = blocks[j - 3];
         s1h = ((t1h >>> 19) | (t1l << 13)) ^ ((t1l >>> 29) | (t1h << 3)) ^ (t1h >>> 6);
         s1l = ((t1l >>> 19) | (t1h << 13)) ^ ((t1h >>> 29) | (t1l << 3)) ^ ((t1l >>> 6) | t1h << 26);
 
-        t1h = w[j - 32];
-        t1l = w[j - 31];
-        t2h = w[j - 14];
-        t2l = w[j - 13];
+        t1h = blocks[j - 32];
+        t1l = blocks[j - 31];
+        t2h = blocks[j - 14];
+        t2l = blocks[j - 13];
 
         c1 = (t2l & 0xFFFF) + (t1l & 0xFFFF) + (s0l & 0xFFFF) + (s1l & 0xFFFF);
         c2 = (t2l >>> 16) + (t1l >>> 16) + (s0l >>> 16) + (s1l >>> 16) + (c1 >>> 16);
         c3 = (t2h & 0xFFFF) + (t1h & 0xFFFF) + (s0h & 0xFFFF) + (s1h & 0xFFFF) + (c2 >>> 16);
         c4 = (t2h >>> 16) + (t1h >>> 16) + (s0h >>> 16) + (s1h >>> 16) + (c3 >>> 16);
 
-        w[j] = (c4 << 16) | (c3 & 0xFFFF);
-        w[j + 1] = (c2 << 16) | (c1 & 0xFFFF);
+        blocks[j] = (c4 << 16) | (c3 & 0xFFFF);
+        blocks[j + 1] = (c2 << 16) | (c1 & 0xFFFF);
       }
 
-      ah = h0h;
-      al = h0l;
-      bh = h1h;
-      bl = h1l;
-      ch = h2h;
-      cl = h2l;
-      dh = h3h;
-      dl = h3l;
-      eh = h4h;
-      el = h4l;
-      fh = h5h;
-      fl = h5l;
-      gh = h6h;
-      gl = h6l;
-      hh = h7h;
-      hl = h7l;
+      var ah = h0h, al = h0l, bh = h1h, bl = h1l, ch = h2h, cl = h2l, dh = h3h, dl = h3l, eh = h4h, el = h4l, fh = h5h, fl = h5l, gh = h6h, gl = h6l, hh = h7h, hl = h7l;
       for(j = 0;j < 160;j += 2) {
         s0h = ((ah >>> 28) | (al << 4)) ^ ((al >>> 2) | (ah << 30)) ^ ((al >>> 7) | (ah << 25));
         s0l = ((al >>> 28) | (ah << 4)) ^ ((ah >>> 2) | (al << 30)) ^ ((ah >>> 7) | (al << 25));
@@ -214,8 +233,8 @@
         chh = (eh & fh) ^ (~eh & gh);
         chl = (el & fl) ^ (~el & gl);
 
-        t1h = w[j];
-        t1l = w[j + 1];
+        t1h = blocks[j];
+        t1l = blocks[j + 1];
         t2h = K[j];
         t2l = K[j + 1];
 
@@ -329,7 +348,7 @@
 
       h7h = (c4 << 16) | (c3 & 0xFFFF);
       h7l = (c2 << 16) | (c1 & 0xFFFF);
-    }
+    } while(!end);
 
     var hex = HEX_CHARS[(h0h >> 28) & 0x0F] + HEX_CHARS[(h0h >> 24) & 0x0F] +
               HEX_CHARS[(h0h >> 20) & 0x0F] + HEX_CHARS[(h0h >> 16) & 0x0F] +
@@ -403,64 +422,6 @@
              HEX_CHARS[(h7l >> 4) & 0x0F] + HEX_CHARS[h7l & 0x0F];
     }
     return hex;
-  };
-
-  var getBytesFromUtf8 = function(str) {
-    var bytes = [], index = 0;
-    for (var i = 0;i < str.length; i++) {
-      var c = str.charCodeAt(i);
-      if (c < 0x80) {
-        bytes[index++] = c;
-      } else if (c < 0x800) {
-        bytes[index++] = 0xc0 | (c >> 6);
-        bytes[index++] = 0x80 | (c & 0x3f);
-      } else if (c < 0xd800 || c >= 0xe000) {
-        bytes[index++] = 0xe0 | (c >> 12);
-        bytes[index++] = 0x80 | ((c >> 6) & 0x3f);
-        bytes[index++] = 0x80 | (c & 0x3f);
-      } else {
-        c = 0x10000 + (((c & 0x3ff) << 10) | (str.charCodeAt(++i) & 0x3ff));
-        bytes[index++] = 0xf0 | (c >> 18);
-        bytes[index++] = 0x80 | ((c >> 12) & 0x3f);
-        bytes[index++] = 0x80 | ((c >> 6) & 0x3f);
-        bytes[index++] = 0x80 | (c & 0x3f);
-      }
-    }
-    return bytes;
-  };
-
-  var getBlocksFromAscii = function(message) {
-    // a block is 32 bits(4 bytes), a chunk is 1024 bits(128 bytes)
-    var length = message.length;
-    var chunkCount = ((length + 16) >> 7) + 1;
-    var blockCount = chunkCount << 5; // chunkCount * 32
-    var blocks = [], i;
-    for(i = 0;i < blockCount;++i) {
-      blocks[i] = 0;
-    }
-    for(i = 0;i < length;++i) {
-      blocks[i >> 2] |= message.charCodeAt(i) << SHIFT[i & 3];
-    }
-    blocks[i >> 2] |= 0x80 << SHIFT[i & 3];
-    blocks[blockCount - 1] = length << 3; // length * 8
-    return blocks;
-  };
-  
-  var getBlocksFromUtf8 = function(message) {
-    var bytes = getBytesFromUtf8(message);
-    var length = bytes.length;
-    var chunkCount = ((length + 16) >> 7) + 1;
-    var blockCount = chunkCount << 5; // chunkCount * 32
-    var blocks = [], i;
-    for(i = 0;i < blockCount;++i) {
-      blocks[i] = 0;
-    }
-    for(i = 0;i < length;++i) {
-      blocks[i >> 2] |= bytes[i] << SHIFT[i & 3];
-    }
-    blocks[i >> 2] |= 0x80 << SHIFT[i & 3];
-    blocks[blockCount - 1] = length << 3; // length * 8
-    return blocks;
   };
 
   if(!root.JS_SHA512_TEST && NODE_JS) {
