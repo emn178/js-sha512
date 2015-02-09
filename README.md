@@ -89,6 +89,10 @@ Output
     b6dab29c16ec35ab34a5d92ff135b58de96741dda78b1009a2181cf8b45d2f72
     0f46a0ae7f226517dd66ece0ce1efa29ffb7ced05ac4566fdcaed188
 
+## Benchmark
+[UTF8](http://jsperf.com/sha-512/10)  
+[ASCII](http://jsperf.com/sha-512/9)
+
 ## Extensions
 ### jQuery
 If you prefer jQuery style, you can add following code to add a jQuery extension.

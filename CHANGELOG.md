@@ -1,3 +1,7 @@
+# v0.2.2 / 2015-02-09
+
+* Improve performance.
+
 # v0.2.1 / 2015-02-08
 
 * Remove ascii parameter.
