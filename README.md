@@ -1,6 +1,7 @@
 # js-sha512
 [![Build Status](https://travis-ci.org/emn178/js-sha512.svg?branch=master)](https://travis-ci.org/emn178/js-sha512)
-[![Coverage Status](https://coveralls.io/repos/emn178/js-sha512/badge.svg?branch=master)](https://coveralls.io/r/emn178/js-sha512?branch=master)  
+[![Coverage Status](https://coveralls.io/repos/emn178/js-sha512/badge.svg?branch=master)](https://coveralls.io/r/emn178/js-sha512?branch=master)
+[![CDNJS](https://img.shields.io/cdnjs/v/js-sha512.svg)](https://cdnjs.com/libraries/js-sha512/)
 [![NPM](https://nodei.co/npm/js-sha512.png?stars&downloads)](https://nodei.co/npm/js-sha512/)  
 A simple SHA-512, SHA-384, SHA-512/224, SHA-512/256 hash functions for JavaScript supports UTF-8 encoding.
 
