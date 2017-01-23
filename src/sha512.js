@@ -1,86 +1,91 @@
 /*
- * js-sha512 v0.2.2
- * https://github.com/emn178/js-sha512
+ * [js-sha512]{@link https://github.com/emn178/js-sha512}
  *
- * Copyright 2014-2015, emn178@gmail.com
- *
- * Licensed under the MIT license:
- * http://www.opensource.org/licenses/MIT
+ * @version 0.3.0
+ * @author Chen, Yi-Cyuan [emn178@gmail.com]
+ * @copyright Chen, Yi-Cyuan 2014-2017
+ * @license MIT
  */
-;(function(root, undefined) {
+/*jslint bitwise: true */
+(function () {
   'use strict';
 
-  var NODE_JS = typeof(module) != 'undefined';
-  if(NODE_JS) {
+  var root = typeof window === 'object' ? window : {};
+  var NODE_JS = !root.JS_SHA512_NO_NODE_JS && typeof process === 'object' && process.versions && process.versions.node;
+  if (NODE_JS) {
     root = global;
   }
+  var COMMON_JS = !root.JS_SHA512_NO_COMMON_JS && typeof module === 'object' && module.exports;
+  var AMD = typeof define === 'function' && define.amd;
   var HEX_CHARS = '0123456789abcdef'.split('');
   var EXTRA = [-2147483648, 8388608, 32768, 128];
   var SHIFT = [24, 16, 8, 0];
-  var K =[0x428A2F98, 0xD728AE22, 0x71374491, 0x23EF65CD,
-          0xB5C0FBCF, 0xEC4D3B2F, 0xE9B5DBA5, 0x8189DBBC,
-          0x3956C25B, 0xF348B538, 0x59F111F1, 0xB605D019,
-          0x923F82A4, 0xAF194F9B, 0xAB1C5ED5, 0xDA6D8118,
-          0xD807AA98, 0xA3030242, 0x12835B01, 0x45706FBE,
-          0x243185BE, 0x4EE4B28C, 0x550C7DC3, 0xD5FFB4E2,
-          0x72BE5D74, 0xF27B896F, 0x80DEB1FE, 0x3B1696B1,
-          0x9BDC06A7, 0x25C71235, 0xC19BF174, 0xCF692694,
-          0xE49B69C1, 0x9EF14AD2, 0xEFBE4786, 0x384F25E3,
-          0x0FC19DC6, 0x8B8CD5B5, 0x240CA1CC, 0x77AC9C65,
-          0x2DE92C6F, 0x592B0275, 0x4A7484AA, 0x6EA6E483,
-          0x5CB0A9DC, 0xBD41FBD4, 0x76F988DA, 0x831153B5,
-          0x983E5152, 0xEE66DFAB, 0xA831C66D, 0x2DB43210,
-          0xB00327C8, 0x98FB213F, 0xBF597FC7, 0xBEEF0EE4,
-          0xC6E00BF3, 0x3DA88FC2, 0xD5A79147, 0x930AA725,
-          0x06CA6351, 0xE003826F, 0x14292967, 0x0A0E6E70,
-          0x27B70A85, 0x46D22FFC, 0x2E1B2138, 0x5C26C926,
-          0x4D2C6DFC, 0x5AC42AED, 0x53380D13, 0x9D95B3DF,
-          0x650A7354, 0x8BAF63DE, 0x766A0ABB, 0x3C77B2A8,
-          0x81C2C92E, 0x47EDAEE6, 0x92722C85, 0x1482353B,
-          0xA2BFE8A1, 0x4CF10364, 0xA81A664B, 0xBC423001,
-          0xC24B8B70, 0xD0F89791, 0xC76C51A3, 0x0654BE30,
-          0xD192E819, 0xD6EF5218, 0xD6990624, 0x5565A910,
-          0xF40E3585, 0x5771202A, 0x106AA070, 0x32BBD1B8,
-          0x19A4C116, 0xB8D2D0C8, 0x1E376C08, 0x5141AB53,
-          0x2748774C, 0xDF8EEB99, 0x34B0BCB5, 0xE19B48A8,
-          0x391C0CB3, 0xC5C95A63, 0x4ED8AA4A, 0xE3418ACB,
-          0x5B9CCA4F, 0x7763E373, 0x682E6FF3, 0xD6B2B8A3,
-          0x748F82EE, 0x5DEFB2FC, 0x78A5636F, 0x43172F60,
-          0x84C87814, 0xA1F0AB72, 0x8CC70208, 0x1A6439EC,
-          0x90BEFFFA, 0x23631E28, 0xA4506CEB, 0xDE82BDE9,
-          0xBEF9A3F7, 0xB2C67915, 0xC67178F2, 0xE372532B,
-          0xCA273ECE, 0xEA26619C, 0xD186B8C7, 0x21C0C207,
-          0xEADA7DD6, 0xCDE0EB1E, 0xF57D4F7F, 0xEE6ED178,
-          0x06F067AA, 0x72176FBA, 0x0A637DC5, 0xA2C898A6,
-          0x113F9804, 0xBEF90DAE, 0x1B710B35, 0x131C471B,
-          0x28DB77F5, 0x23047D84, 0x32CAAB7B, 0x40C72493,
-          0x3C9EBE0A, 0x15C9BEBC, 0x431D67C4, 0x9C100D4C,
-          0x4CC5D4BE, 0xCB3E42B6, 0x597F299C, 0xFC657E2A,
-          0x5FCB6FAB, 0x3AD6FAEC, 0x6C44198C, 0x4A475817];
+  var K =[
+    0x428A2F98, 0xD728AE22, 0x71374491, 0x23EF65CD,
+    0xB5C0FBCF, 0xEC4D3B2F, 0xE9B5DBA5, 0x8189DBBC,
+    0x3956C25B, 0xF348B538, 0x59F111F1, 0xB605D019,
+    0x923F82A4, 0xAF194F9B, 0xAB1C5ED5, 0xDA6D8118,
+    0xD807AA98, 0xA3030242, 0x12835B01, 0x45706FBE,
+    0x243185BE, 0x4EE4B28C, 0x550C7DC3, 0xD5FFB4E2,
+    0x72BE5D74, 0xF27B896F, 0x80DEB1FE, 0x3B1696B1,
+    0x9BDC06A7, 0x25C71235, 0xC19BF174, 0xCF692694,
+    0xE49B69C1, 0x9EF14AD2, 0xEFBE4786, 0x384F25E3,
+    0x0FC19DC6, 0x8B8CD5B5, 0x240CA1CC, 0x77AC9C65,
+    0x2DE92C6F, 0x592B0275, 0x4A7484AA, 0x6EA6E483,
+    0x5CB0A9DC, 0xBD41FBD4, 0x76F988DA, 0x831153B5,
+    0x983E5152, 0xEE66DFAB, 0xA831C66D, 0x2DB43210,
+    0xB00327C8, 0x98FB213F, 0xBF597FC7, 0xBEEF0EE4,
+    0xC6E00BF3, 0x3DA88FC2, 0xD5A79147, 0x930AA725,
+    0x06CA6351, 0xE003826F, 0x14292967, 0x0A0E6E70,
+    0x27B70A85, 0x46D22FFC, 0x2E1B2138, 0x5C26C926,
+    0x4D2C6DFC, 0x5AC42AED, 0x53380D13, 0x9D95B3DF,
+    0x650A7354, 0x8BAF63DE, 0x766A0ABB, 0x3C77B2A8,
+    0x81C2C92E, 0x47EDAEE6, 0x92722C85, 0x1482353B,
+    0xA2BFE8A1, 0x4CF10364, 0xA81A664B, 0xBC423001,
+    0xC24B8B70, 0xD0F89791, 0xC76C51A3, 0x0654BE30,
+    0xD192E819, 0xD6EF5218, 0xD6990624, 0x5565A910,
+    0xF40E3585, 0x5771202A, 0x106AA070, 0x32BBD1B8,
+    0x19A4C116, 0xB8D2D0C8, 0x1E376C08, 0x5141AB53,
+    0x2748774C, 0xDF8EEB99, 0x34B0BCB5, 0xE19B48A8,
+    0x391C0CB3, 0xC5C95A63, 0x4ED8AA4A, 0xE3418ACB,
+    0x5B9CCA4F, 0x7763E373, 0x682E6FF3, 0xD6B2B8A3,
+    0x748F82EE, 0x5DEFB2FC, 0x78A5636F, 0x43172F60,
+    0x84C87814, 0xA1F0AB72, 0x8CC70208, 0x1A6439EC,
+    0x90BEFFFA, 0x23631E28, 0xA4506CEB, 0xDE82BDE9,
+    0xBEF9A3F7, 0xB2C67915, 0xC67178F2, 0xE372532B,
+    0xCA273ECE, 0xEA26619C, 0xD186B8C7, 0x21C0C207,
+    0xEADA7DD6, 0xCDE0EB1E, 0xF57D4F7F, 0xEE6ED178,
+    0x06F067AA, 0x72176FBA, 0x0A637DC5, 0xA2C898A6,
+    0x113F9804, 0xBEF90DAE, 0x1B710B35, 0x131C471B,
+    0x28DB77F5, 0x23047D84, 0x32CAAB7B, 0x40C72493,
+    0x3C9EBE0A, 0x15C9BEBC, 0x431D67C4, 0x9C100D4C,
+    0x4CC5D4BE, 0xCB3E42B6, 0x597F299C, 0xFC657E2A,
+    0x5FCB6FAB, 0x3AD6FAEC, 0x6C44198C, 0x4A475817
+  ];
 
   var blocks = [];
 
-  var sha384 = function(message) {
+  var sha384 = function (message) {
     return sha512(message, 384);
   };
 
-  var sha512_256 = function(message) {
+  var sha512_256 = function (message) {
     return sha512(message, 256);
   };
 
-  var sha512_224 = function(message) {
+  var sha512_224 = function (message) {
     return sha512(message, 224);
   };
 
-  var sha512 = function(message, bits) {
+  var sha512 = function (message, bits) {
     var h0h, h0l, h1h, h1l, h2h, h2l, h3h, h3l, 
-        h4h, h4l, h5h, h5l, h6h, h6l, h7h, h7l, block, code, end = false,
-        i, j, index = 0, start = 0, bytes = 0, length = message.length,
-        s0h, s0l, s1h, s1l, c1, c2, c3, c4, 
-        abh, abl, dah, dal, cdh, cdl, bch, bcl,
-        majh, majl, t1h, t1l, t2h, t2l, chh, chl;
+      h4h, h4l, h5h, h5l, h6h, h6l, h7h, h7l, block, code, end = false,
+      i, j, index = 0, start = 0, bytes = 0, length = message.length,
+      s0h, s0l, s1h, s1l, c1, c2, c3, c4, 
+      abh, abl, dah, dal, cdh, cdl, bch, bcl,
+      majh, majl, t1h, t1l, t2h, t2l, chh, chl;
 
-    if(bits == 384) {
+    if (bits == 384) {
       h0h = 0xCBBB9D5D;
       h0l = 0xC1059ED8;
       h1h = 0x629A292A;
@@ -97,7 +102,7 @@
       h6l = 0x64F98FA7;
       h7h = 0x47B5481D;
       h7l = 0xBEFA4FA4;
-    } else if(bits == 256) {
+    } else if (bits == 256) {
       h0h = 0x22312194;
       h0l = 0xFC2BF72C;
       h1h = 0x9F555FA3;
@@ -114,7 +119,7 @@
       h6l = 0x2C85B8AA;
       h7h = 0x0EB72DDC;
       h7l = 0x81C52CA2;
-    } else if(bits == 224) {
+    } else if (bits == 224) {
       h0h = 0x8C3D37C8;
       h0l = 0x19544DA2;
       h1h = 0x73E19966;
@@ -161,7 +166,7 @@
       blocks[21] = blocks[22] = blocks[23] = blocks[24] =
       blocks[25] = blocks[26] = blocks[27] = blocks[28] =
       blocks[29] = blocks[30] = blocks[31] = blocks[32] = 0;
-      for (i = start;index < length && i < 128; ++index) {
+      for (i = start; index < length && i < 128; ++index) {
         code = message.charCodeAt(index);
         if (code < 0x80) {
           blocks[i >> 2] |= code << SHIFT[i++ & 3];
@@ -182,17 +187,17 @@
       }
       bytes += i - start;
       start = i - 128;
-      if(index == length) {
+      if (index == length) {
         blocks[i >> 2] |= EXTRA[i & 3];
         ++index;
       }
       block = blocks[32];
-      if(index > length && i < 112) {
+      if (index > length && i < 112) {
         blocks[31] = bytes << 3;
         end = true;
       }
 
-      for(j = 32;j < 160;j += 2) {
+      for (j = 32; j < 160; j += 2) {
         t1h = blocks[j - 30];
         t1l = blocks[j - 29];
         s0h = ((t1h >>> 1) | (t1l << 31)) ^ ((t1h >>> 8) | (t1l << 24)) ^ (t1h >>> 7);
@@ -220,7 +225,7 @@
       var ah = h0h, al = h0l, bh = h1h, bl = h1l, ch = h2h, cl = h2l, dh = h3h, dl = h3l, eh = h4h, el = h4l, fh = h5h, fl = h5l, gh = h6h, gl = h6l, hh = h7h, hl = h7l;
       bch = bh & ch;
       bcl = bl & cl;
-      for(j = 0;j < 160;j += 8) {
+      for (j = 0; j < 160; j += 8) {
         s0h = ((ah >>> 28) | (al << 4)) ^ ((al >>> 2) | (ah << 30)) ^ ((al >>> 7) | (ah << 25));
         s0l = ((al >>> 28) | (ah << 4)) ^ ((ah >>> 2) | (al << 30)) ^ ((ah >>> 7) | (al << 25));
 
@@ -489,91 +494,98 @@
 
       h7h = (c4 << 16) | (c3 & 0xFFFF);
       h7l = (c2 << 16) | (c1 & 0xFFFF);
-    } while(!end);
+    } while (!end);
 
     var hex = HEX_CHARS[(h0h >> 28) & 0x0F] + HEX_CHARS[(h0h >> 24) & 0x0F] +
-              HEX_CHARS[(h0h >> 20) & 0x0F] + HEX_CHARS[(h0h >> 16) & 0x0F] +
-              HEX_CHARS[(h0h >> 12) & 0x0F] + HEX_CHARS[(h0h >> 8) & 0x0F] +
-              HEX_CHARS[(h0h >> 4) & 0x0F] + HEX_CHARS[h0h & 0x0F] +
-              HEX_CHARS[(h0l >> 28) & 0x0F] + HEX_CHARS[(h0l >> 24) & 0x0F] +
-              HEX_CHARS[(h0l >> 20) & 0x0F] + HEX_CHARS[(h0l >> 16) & 0x0F] +
-              HEX_CHARS[(h0l >> 12) & 0x0F] + HEX_CHARS[(h0l >> 8) & 0x0F] +
-              HEX_CHARS[(h0l >> 4) & 0x0F] + HEX_CHARS[h0l & 0x0F] +
-              HEX_CHARS[(h1h >> 28) & 0x0F] + HEX_CHARS[(h1h >> 24) & 0x0F] +
-              HEX_CHARS[(h1h >> 20) & 0x0F] + HEX_CHARS[(h1h >> 16) & 0x0F] +
-              HEX_CHARS[(h1h >> 12) & 0x0F] + HEX_CHARS[(h1h >> 8) & 0x0F] +
-              HEX_CHARS[(h1h >> 4) & 0x0F] + HEX_CHARS[h1h & 0x0F] +
-              HEX_CHARS[(h1l >> 28) & 0x0F] + HEX_CHARS[(h1l >> 24) & 0x0F] +
-              HEX_CHARS[(h1l >> 20) & 0x0F] + HEX_CHARS[(h1l >> 16) & 0x0F] +
-              HEX_CHARS[(h1l >> 12) & 0x0F] + HEX_CHARS[(h1l >> 8) & 0x0F] +
-              HEX_CHARS[(h1l >> 4) & 0x0F] + HEX_CHARS[h1l & 0x0F] +
-              HEX_CHARS[(h2h >> 28) & 0x0F] + HEX_CHARS[(h2h >> 24) & 0x0F] +
-              HEX_CHARS[(h2h >> 20) & 0x0F] + HEX_CHARS[(h2h >> 16) & 0x0F] +
-              HEX_CHARS[(h2h >> 12) & 0x0F] + HEX_CHARS[(h2h >> 8) & 0x0F] +
-              HEX_CHARS[(h2h >> 4) & 0x0F] + HEX_CHARS[h2h & 0x0F] +
-              HEX_CHARS[(h2l >> 28) & 0x0F] + HEX_CHARS[(h2l >> 24) & 0x0F] +
-              HEX_CHARS[(h2l >> 20) & 0x0F] + HEX_CHARS[(h2l >> 16) & 0x0F] +
-              HEX_CHARS[(h2l >> 12) & 0x0F] + HEX_CHARS[(h2l >> 8) & 0x0F] +
-              HEX_CHARS[(h2l >> 4) & 0x0F] + HEX_CHARS[h2l & 0x0F] +
-              HEX_CHARS[(h3h >> 28) & 0x0F] + HEX_CHARS[(h3h >> 24) & 0x0F] +
-              HEX_CHARS[(h3h >> 20) & 0x0F] + HEX_CHARS[(h3h >> 16) & 0x0F] +
-              HEX_CHARS[(h3h >> 12) & 0x0F] + HEX_CHARS[(h3h >> 8) & 0x0F] +
-              HEX_CHARS[(h3h >> 4) & 0x0F] + HEX_CHARS[h3h & 0x0F];
-    if(bits >= 256) {
+      HEX_CHARS[(h0h >> 20) & 0x0F] + HEX_CHARS[(h0h >> 16) & 0x0F] +
+      HEX_CHARS[(h0h >> 12) & 0x0F] + HEX_CHARS[(h0h >> 8) & 0x0F] +
+      HEX_CHARS[(h0h >> 4) & 0x0F] + HEX_CHARS[h0h & 0x0F] +
+      HEX_CHARS[(h0l >> 28) & 0x0F] + HEX_CHARS[(h0l >> 24) & 0x0F] +
+      HEX_CHARS[(h0l >> 20) & 0x0F] + HEX_CHARS[(h0l >> 16) & 0x0F] +
+      HEX_CHARS[(h0l >> 12) & 0x0F] + HEX_CHARS[(h0l >> 8) & 0x0F] +
+      HEX_CHARS[(h0l >> 4) & 0x0F] + HEX_CHARS[h0l & 0x0F] +
+      HEX_CHARS[(h1h >> 28) & 0x0F] + HEX_CHARS[(h1h >> 24) & 0x0F] +
+      HEX_CHARS[(h1h >> 20) & 0x0F] + HEX_CHARS[(h1h >> 16) & 0x0F] +
+      HEX_CHARS[(h1h >> 12) & 0x0F] + HEX_CHARS[(h1h >> 8) & 0x0F] +
+      HEX_CHARS[(h1h >> 4) & 0x0F] + HEX_CHARS[h1h & 0x0F] +
+      HEX_CHARS[(h1l >> 28) & 0x0F] + HEX_CHARS[(h1l >> 24) & 0x0F] +
+      HEX_CHARS[(h1l >> 20) & 0x0F] + HEX_CHARS[(h1l >> 16) & 0x0F] +
+      HEX_CHARS[(h1l >> 12) & 0x0F] + HEX_CHARS[(h1l >> 8) & 0x0F] +
+      HEX_CHARS[(h1l >> 4) & 0x0F] + HEX_CHARS[h1l & 0x0F] +
+      HEX_CHARS[(h2h >> 28) & 0x0F] + HEX_CHARS[(h2h >> 24) & 0x0F] +
+      HEX_CHARS[(h2h >> 20) & 0x0F] + HEX_CHARS[(h2h >> 16) & 0x0F] +
+      HEX_CHARS[(h2h >> 12) & 0x0F] + HEX_CHARS[(h2h >> 8) & 0x0F] +
+      HEX_CHARS[(h2h >> 4) & 0x0F] + HEX_CHARS[h2h & 0x0F] +
+      HEX_CHARS[(h2l >> 28) & 0x0F] + HEX_CHARS[(h2l >> 24) & 0x0F] +
+      HEX_CHARS[(h2l >> 20) & 0x0F] + HEX_CHARS[(h2l >> 16) & 0x0F] +
+      HEX_CHARS[(h2l >> 12) & 0x0F] + HEX_CHARS[(h2l >> 8) & 0x0F] +
+      HEX_CHARS[(h2l >> 4) & 0x0F] + HEX_CHARS[h2l & 0x0F] +
+      HEX_CHARS[(h3h >> 28) & 0x0F] + HEX_CHARS[(h3h >> 24) & 0x0F] +
+      HEX_CHARS[(h3h >> 20) & 0x0F] + HEX_CHARS[(h3h >> 16) & 0x0F] +
+      HEX_CHARS[(h3h >> 12) & 0x0F] + HEX_CHARS[(h3h >> 8) & 0x0F] +
+      HEX_CHARS[(h3h >> 4) & 0x0F] + HEX_CHARS[h3h & 0x0F];
+    if (bits >= 256) {
       hex += HEX_CHARS[(h3l >> 28) & 0x0F] + HEX_CHARS[(h3l >> 24) & 0x0F] +
-             HEX_CHARS[(h3l >> 20) & 0x0F] + HEX_CHARS[(h3l >> 16) & 0x0F] +
-             HEX_CHARS[(h3l >> 12) & 0x0F] + HEX_CHARS[(h3l >> 8) & 0x0F] +
-             HEX_CHARS[(h3l >> 4) & 0x0F] + HEX_CHARS[h3l & 0x0F];
+        HEX_CHARS[(h3l >> 20) & 0x0F] + HEX_CHARS[(h3l >> 16) & 0x0F] +
+        HEX_CHARS[(h3l >> 12) & 0x0F] + HEX_CHARS[(h3l >> 8) & 0x0F] +
+        HEX_CHARS[(h3l >> 4) & 0x0F] + HEX_CHARS[h3l & 0x0F];
     }
-    if(bits >= 384) {
+    if (bits >= 384) {
       hex += HEX_CHARS[(h4h >> 28) & 0x0F] + HEX_CHARS[(h4h >> 24) & 0x0F] +
-             HEX_CHARS[(h4h >> 20) & 0x0F] + HEX_CHARS[(h4h >> 16) & 0x0F] +
-             HEX_CHARS[(h4h >> 12) & 0x0F] + HEX_CHARS[(h4h >> 8) & 0x0F] +
-             HEX_CHARS[(h4h >> 4) & 0x0F] + HEX_CHARS[h4h & 0x0F] +
-             HEX_CHARS[(h4l >> 28) & 0x0F] + HEX_CHARS[(h4l >> 24) & 0x0F] +
-             HEX_CHARS[(h4l >> 20) & 0x0F] + HEX_CHARS[(h4l >> 16) & 0x0F] +
-             HEX_CHARS[(h4l >> 12) & 0x0F] + HEX_CHARS[(h4l >> 8) & 0x0F] +
-             HEX_CHARS[(h4l >> 4) & 0x0F] + HEX_CHARS[h4l & 0x0F] +
-             HEX_CHARS[(h5h >> 28) & 0x0F] + HEX_CHARS[(h5h >> 24) & 0x0F] +
-             HEX_CHARS[(h5h >> 20) & 0x0F] + HEX_CHARS[(h5h >> 16) & 0x0F] +
-             HEX_CHARS[(h5h >> 12) & 0x0F] + HEX_CHARS[(h5h >> 8) & 0x0F] +
-             HEX_CHARS[(h5h >> 4) & 0x0F] + HEX_CHARS[h5h & 0x0F] +
-             HEX_CHARS[(h5l >> 28) & 0x0F] + HEX_CHARS[(h5l >> 24) & 0x0F] +
-             HEX_CHARS[(h5l >> 20) & 0x0F] + HEX_CHARS[(h5l >> 16) & 0x0F] +
-             HEX_CHARS[(h5l >> 12) & 0x0F] + HEX_CHARS[(h5l >> 8) & 0x0F] +
-             HEX_CHARS[(h5l >> 4) & 0x0F] + HEX_CHARS[h5l & 0x0F];
+        HEX_CHARS[(h4h >> 20) & 0x0F] + HEX_CHARS[(h4h >> 16) & 0x0F] +
+        HEX_CHARS[(h4h >> 12) & 0x0F] + HEX_CHARS[(h4h >> 8) & 0x0F] +
+        HEX_CHARS[(h4h >> 4) & 0x0F] + HEX_CHARS[h4h & 0x0F] +
+        HEX_CHARS[(h4l >> 28) & 0x0F] + HEX_CHARS[(h4l >> 24) & 0x0F] +
+        HEX_CHARS[(h4l >> 20) & 0x0F] + HEX_CHARS[(h4l >> 16) & 0x0F] +
+        HEX_CHARS[(h4l >> 12) & 0x0F] + HEX_CHARS[(h4l >> 8) & 0x0F] +
+        HEX_CHARS[(h4l >> 4) & 0x0F] + HEX_CHARS[h4l & 0x0F] +
+        HEX_CHARS[(h5h >> 28) & 0x0F] + HEX_CHARS[(h5h >> 24) & 0x0F] +
+        HEX_CHARS[(h5h >> 20) & 0x0F] + HEX_CHARS[(h5h >> 16) & 0x0F] +
+        HEX_CHARS[(h5h >> 12) & 0x0F] + HEX_CHARS[(h5h >> 8) & 0x0F] +
+        HEX_CHARS[(h5h >> 4) & 0x0F] + HEX_CHARS[h5h & 0x0F] +
+        HEX_CHARS[(h5l >> 28) & 0x0F] + HEX_CHARS[(h5l >> 24) & 0x0F] +
+        HEX_CHARS[(h5l >> 20) & 0x0F] + HEX_CHARS[(h5l >> 16) & 0x0F] +
+        HEX_CHARS[(h5l >> 12) & 0x0F] + HEX_CHARS[(h5l >> 8) & 0x0F] +
+        HEX_CHARS[(h5l >> 4) & 0x0F] + HEX_CHARS[h5l & 0x0F];
     }
-    if(bits == 512) {
+    if (bits == 512) {
       hex += HEX_CHARS[(h6h >> 28) & 0x0F] + HEX_CHARS[(h6h >> 24) & 0x0F] +
-             HEX_CHARS[(h6h >> 20) & 0x0F] + HEX_CHARS[(h6h >> 16) & 0x0F] +
-             HEX_CHARS[(h6h >> 12) & 0x0F] + HEX_CHARS[(h6h >> 8) & 0x0F] +
-             HEX_CHARS[(h6h >> 4) & 0x0F] + HEX_CHARS[h6h & 0x0F] +
-             HEX_CHARS[(h6l >> 28) & 0x0F] + HEX_CHARS[(h6l >> 24) & 0x0F] +
-             HEX_CHARS[(h6l >> 20) & 0x0F] + HEX_CHARS[(h6l >> 16) & 0x0F] +
-             HEX_CHARS[(h6l >> 12) & 0x0F] + HEX_CHARS[(h6l >> 8) & 0x0F] +
-             HEX_CHARS[(h6l >> 4) & 0x0F] + HEX_CHARS[h6l & 0x0F] +
-             HEX_CHARS[(h7h >> 28) & 0x0F] + HEX_CHARS[(h7h >> 24) & 0x0F] +
-             HEX_CHARS[(h7h >> 20) & 0x0F] + HEX_CHARS[(h7h >> 16) & 0x0F] +
-             HEX_CHARS[(h7h >> 12) & 0x0F] + HEX_CHARS[(h7h >> 8) & 0x0F] +
-             HEX_CHARS[(h7h >> 4) & 0x0F] + HEX_CHARS[h7h & 0x0F] +
-             HEX_CHARS[(h7l >> 28) & 0x0F] + HEX_CHARS[(h7l >> 24) & 0x0F] +
-             HEX_CHARS[(h7l >> 20) & 0x0F] + HEX_CHARS[(h7l >> 16) & 0x0F] +
-             HEX_CHARS[(h7l >> 12) & 0x0F] + HEX_CHARS[(h7l >> 8) & 0x0F] +
-             HEX_CHARS[(h7l >> 4) & 0x0F] + HEX_CHARS[h7l & 0x0F];
+        HEX_CHARS[(h6h >> 20) & 0x0F] + HEX_CHARS[(h6h >> 16) & 0x0F] +
+        HEX_CHARS[(h6h >> 12) & 0x0F] + HEX_CHARS[(h6h >> 8) & 0x0F] +
+        HEX_CHARS[(h6h >> 4) & 0x0F] + HEX_CHARS[h6h & 0x0F] +
+        HEX_CHARS[(h6l >> 28) & 0x0F] + HEX_CHARS[(h6l >> 24) & 0x0F] +
+        HEX_CHARS[(h6l >> 20) & 0x0F] + HEX_CHARS[(h6l >> 16) & 0x0F] +
+        HEX_CHARS[(h6l >> 12) & 0x0F] + HEX_CHARS[(h6l >> 8) & 0x0F] +
+        HEX_CHARS[(h6l >> 4) & 0x0F] + HEX_CHARS[h6l & 0x0F] +
+        HEX_CHARS[(h7h >> 28) & 0x0F] + HEX_CHARS[(h7h >> 24) & 0x0F] +
+        HEX_CHARS[(h7h >> 20) & 0x0F] + HEX_CHARS[(h7h >> 16) & 0x0F] +
+        HEX_CHARS[(h7h >> 12) & 0x0F] + HEX_CHARS[(h7h >> 8) & 0x0F] +
+        HEX_CHARS[(h7h >> 4) & 0x0F] + HEX_CHARS[h7h & 0x0F] +
+        HEX_CHARS[(h7l >> 28) & 0x0F] + HEX_CHARS[(h7l >> 24) & 0x0F] +
+        HEX_CHARS[(h7l >> 20) & 0x0F] + HEX_CHARS[(h7l >> 16) & 0x0F] +
+        HEX_CHARS[(h7l >> 12) & 0x0F] + HEX_CHARS[(h7l >> 8) & 0x0F] +
+        HEX_CHARS[(h7l >> 4) & 0x0F] + HEX_CHARS[h7l & 0x0F];
     }
     return hex;
   };
 
-  if(!root.JS_SHA512_TEST && NODE_JS) {
-    sha512.sha512 = sha512;
-    sha512.sha384 = sha384;
-    sha512.sha512_256 = sha512_256;
-    sha512.sha512_224 = sha512_224;
-    module.exports = sha512;
-  } else if(root) {
+  var exports = sha512;
+  exports.sha512 = sha512;
+  exports.sha384 = sha384;
+  exports.sha512_256 = sha512_256;
+  exports.sha512_224 = sha512_224;
+
+  if (COMMON_JS) {
+    module.exports = exports;
+  } else {
     root.sha512 = sha512;
     root.sha384 = sha384;
     root.sha512_256 = sha512_256;
     root.sha512_224 = sha512_224;
+    if (AMD) {
+      define(function () {
+        return exports;
+      });
+    }
   }
-}(this));
+})();

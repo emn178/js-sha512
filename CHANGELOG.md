@@ -1,34 +1,47 @@
-# v0.2.2 / 2015-02-09
+# Change Log
 
-* Improve performance.
+## v0.3.0 / 2017-01-23
+### Added
+- AMD support.
+### Fixed
+- ArrayBuffer dosen't work in Webpack.
 
-# v0.2.1 / 2015-02-08
+## v0.2.2 / 2015-02-09
+### Improved
+- performance.
 
-* Remove ascii parameter.
-* Improve performance.
-* Add test cases.
+## v0.2.1 / 2015-02-08
+### Added
+- test cases.
+### Removed
+- ascii parameter.
+### Improved
+- performance.
 
-# v0.2.0 / 2015-02-02
+## v0.2.0 / 2015-02-02
+### Added
+- test cases.
+### Improved
+- performance.
 
-* Add test cases.
-* Improve performance.
+## v0.1.3 / 2015-01-26
+### Added
+- test cases.
+### Improved
+- performance.
 
-# v0.1.3 / 2015-01-26
+## v0.1.2 / 2015-01-07
+### Added
+- bower package.
+- travis.
+- coveralls.
+### Fixed
+- JSHint warnings.
 
-* Add test cases.
-* Improve performance.
+## v0.1.1 / 2014-07-27
+### Fixed
+- accents bug.
 
-# v0.1.2 / 2015-01-07
-
-* Add bower package.
-* Fixed JSHint warnings.
-* Add travis.
-* Add coveralls.
-
-# v0.1.1 / 2014-07-27
-
-Fixed accents bug
-
-# v0.1.0 / 2014-01-05
-
-Initial release
+## v0.1.0 / 2014-01-05
+### Added
+- initial release.
