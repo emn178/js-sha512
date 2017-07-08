@@ -31,6 +31,14 @@ sha512('Message to hash');
 sha384('Message to hash');
 sha512_256('Message to hash');
 sha512_224('Message to hash');
+
+var hash = sha512.create();
+hash.update('Message to hash');
+hash.hex();
+
+var hash2 = sha512.update('Message to hash');
+hash2.update('Message2 to hash');
+hash2.array();
 ```
 If you use node.js, you should require the module first:
 ```JavaScript
@@ -69,6 +77,13 @@ sha512('中文'); // 8b88efc2ebbcbdad5ac2d65af05bec57bda25e71fd5fb25bbd892057a27
 sha384('中文'); // 93422ceb8291a69b22f02dc1114c39a287493ad525dcebc77e4019a44eaee2633a85d0f29cd298ee6799048c33a4be0c
 sha512_256('中文'); // b6dab29c16ec35ab34a5d92ff135b58de96741dda78b1009a2181cf8b45d2f72
 sha512_224('中文'); // 0f46a0ae7f226517dd66ece0ce1efa29ffb7ced05ac4566fdcaed188
+
+// Different output
+sha512(''); // cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
+sha512.hex(''); // cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
+sha512.array(''); // [207, 131, 225, 53, 126, 239, 184, 189, 241, 84, 40, 80, 214, 109, 128, 7, 214, 32, 228, 5, 11, 87, 21, 220, 131, 244, 169, 33, 211, 108, 233, 206, 71, 208, 209, 60, 93, 133, 242, 176, 255, 131, 24, 210, 135, 126, 236, 47, 99, 185, 49, 189, 71, 65, 122, 129, 165, 56, 50, 122, 249, 39, 218, 62]
+sha512.digest(''); // [207, 131, 225, 53, 126, 239, 184, 189, 241, 84, 40, 80, 214, 109, 128, 7, 214, 32, 228, 5, 11, 87, 21, 220, 131, 244, 169, 33, 211, 108, 233, 206, 71, 208, 209, 60, 93, 133, 242, 176, 255, 131, 24, 210, 135, 126, 236, 47, 99, 185, 49, 189, 71, 65, 122, 129, 165, 56, 50, 122, 249, 39, 218, 62]
+sha512.arrayBuffer(''); // ArrayBuffer
 ```
 
 ## License

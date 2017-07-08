@@ -1,6 +1,6 @@
 {
   "name": "js-sha512",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "This is a simple SHA-512, SHA-384, SHA-512/224, SHA-512/256 hash functions for JavaScript supports UTF-8 encoding.",
   "main": "src/sha512.js",
   "devDependencies": {
