@@ -184,7 +184,7 @@
       return;
     }
     var notString = typeof(message) !== 'string';
-    if (notString && ARRAY_BUFFER && message instanceof root.ArrayBuffer) {
+    if (notString && ARRAY_BUFFER && message instanceof ArrayBuffer) {
       message = new Uint8Array(message);
     }
     var code, index = 0, i, length = message.length || 0, blocks = this.blocks;
