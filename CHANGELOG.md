@@ -1,5 +1,12 @@
 # Change Log
 
+## v0.5.0 / 2017-10-07
+### Added
+- support for web worker. #5
+
+### Changed
+- throw error if input type is incorrect.
+
 ## v0.4.0 / 2017-07-08
 ### Added
 - Streaming support(update).

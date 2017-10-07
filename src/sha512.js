@@ -1,7 +1,7 @@
 /*
  * [js-sha512]{@link https://github.com/emn178/js-sha512}
  *
- * @version 0.4.0
+ * @version 0.5.0
  * @author Chen, Yi-Cyuan [emn178@gmail.com]
  * @copyright Chen, Yi-Cyuan 2014-2017
  * @license MIT
@@ -10,14 +10,22 @@
 (function () {
   'use strict';
 
-  var root = typeof window === 'object' ? window : {};
+  var ERROR = 'input is invalid type';
+  var WINDOW = typeof window === 'object';
+  var root = WINDOW ? window : {};
+  if (root.JS_SHA512_NO_WINDOW) {
+    WINDOW = false;
+  }
+  var WEB_WORKER = !WINDOW && typeof self === 'object';
   var NODE_JS = !root.JS_SHA512_NO_NODE_JS && typeof process === 'object' && process.versions && process.versions.node;
   if (NODE_JS) {
     root = global;
+  } else if (WEB_WORKER) {
+    root = self;
   }
   var COMMON_JS = !root.JS_SHA512_NO_COMMON_JS && typeof module === 'object' && module.exports;
   var AMD = typeof define === 'function' && define.amd;
-  var ARRAY_BUFFER = typeof ArrayBuffer !== 'undefined';
+  var ARRAY_BUFFER = !root.JS_SHA512_NO_ARRAY_BUFFER && typeof ArrayBuffer !== 'undefined';
   var HEX_CHARS = '0123456789abcdef'.split('');
   var EXTRA = [-2147483648, 8388608, 32768, 128];
   var SHIFT = [24, 16, 8, 0];
@@ -68,6 +76,18 @@
 
   var blocks = [];
 
+  if (root.JS_SHA512_NO_NODE_JS || !Array.isArray) {
+    Array.isArray = function (obj) {
+      return Object.prototype.toString.call(obj) === '[object Array]';
+    };
+  }
+
+  if (ARRAY_BUFFER && (root.JS_SHA512_NO_ARRAY_BUFFER_IS_VIEW || !ArrayBuffer.isView)) {
+    ArrayBuffer.isView = function (obj) {
+      return typeof obj === 'object' && obj.buffer && obj.buffer.constructor === ArrayBuffer;
+    };
+  }
+
   var createOutputMethod = function (outputType, bits) {
     return function (message) {
       return new Sha512(bits, true).update(message)[outputType]();
@@ -91,10 +111,10 @@
 
   function Sha512(bits, sharedMemory) {
     if (sharedMemory) {
-      blocks[0] = blocks[1] = blocks[2] = blocks[3] = blocks[4] = 
-      blocks[5] = blocks[6] = blocks[7] = blocks[8] = 
-      blocks[9] = blocks[10] = blocks[11] = blocks[12] = 
-      blocks[13] = blocks[14] = blocks[15] = blocks[16] = 
+      blocks[0] = blocks[1] = blocks[2] = blocks[3] = blocks[4] =
+      blocks[5] = blocks[6] = blocks[7] = blocks[8] =
+      blocks[9] = blocks[10] = blocks[11] = blocks[12] =
+      blocks[13] = blocks[14] = blocks[15] = blocks[16] =
       blocks[17] = blocks[18] = blocks[19] = blocks[20] =
       blocks[21] = blocks[22] = blocks[23] = blocks[24] =
       blocks[25] = blocks[26] = blocks[27] = blocks[28] =
@@ -183,20 +203,34 @@
     if (this.finalized) {
       return;
     }
-    var notString = typeof(message) !== 'string';
-    if (notString && ARRAY_BUFFER && message instanceof root.ArrayBuffer) {
-      message = new Uint8Array(message);
+    var notString, type = typeof message;
+    if (type !== 'string') {
+      if (type === 'object') {
+        if (message === null) {
+          throw ERROR;
+        } else if (ARRAY_BUFFER && message.constructor === ArrayBuffer) {
+          message = new Uint8Array(message);
+        } else if (!Array.isArray(message)) {
+          if (!ARRAY_BUFFER || !ArrayBuffer.isView(message)) {
+            throw ERROR;
+          }
+        }
+      } else {
+        throw ERROR;
+      }
+      notString = true;
     }
-    var code, index = 0, i, length = message.length || 0, blocks = this.blocks;
+    var length = message.length;
+    var code, index = 0, i, length = message.length, blocks = this.blocks;
 
     while (index < length) {
       if (this.hashed) {
         this.hashed = false;
         blocks[0] = this.block;
-        blocks[1] = blocks[2] = blocks[3] = blocks[4] = 
-        blocks[5] = blocks[6] = blocks[7] = blocks[8] = 
-        blocks[9] = blocks[10] = blocks[11] = blocks[12] = 
-        blocks[13] = blocks[14] = blocks[15] = blocks[16] = 
+        blocks[1] = blocks[2] = blocks[3] = blocks[4] =
+        blocks[5] = blocks[6] = blocks[7] = blocks[8] =
+        blocks[9] = blocks[10] = blocks[11] = blocks[12] =
+        blocks[13] = blocks[14] = blocks[15] = blocks[16] =
         blocks[17] = blocks[18] = blocks[19] = blocks[20] =
         blocks[21] = blocks[22] = blocks[23] = blocks[24] =
         blocks[25] = blocks[26] = blocks[27] = blocks[28] =
@@ -257,10 +291,10 @@
         this.hash();
       }
       blocks[0] = this.block;
-      blocks[1] = blocks[2] = blocks[3] = blocks[4] = 
-      blocks[5] = blocks[6] = blocks[7] = blocks[8] = 
-      blocks[9] = blocks[10] = blocks[11] = blocks[12] = 
-      blocks[13] = blocks[14] = blocks[15] = blocks[16] = 
+      blocks[1] = blocks[2] = blocks[3] = blocks[4] =
+      blocks[5] = blocks[6] = blocks[7] = blocks[8] =
+      blocks[9] = blocks[10] = blocks[11] = blocks[12] =
+      blocks[13] = blocks[14] = blocks[15] = blocks[16] =
       blocks[17] = blocks[18] = blocks[19] = blocks[20] =
       blocks[21] = blocks[22] = blocks[23] = blocks[24] =
       blocks[25] = blocks[26] = blocks[27] = blocks[28] =
@@ -272,10 +306,10 @@
 
   Sha512.prototype.hash = function () {
     var h0h = this.h0h, h0l = this.h0l, h1h = this.h1h, h1l = this.h1l,
-      h2h = this.h2h, h2l = this.h2l, h3h = this.h3h, h3l = this.h3l, 
+      h2h = this.h2h, h2l = this.h2l, h3h = this.h3h, h3l = this.h3l,
       h4h = this.h4h, h4l = this.h4l, h5h = this.h5h, h5l = this.h5l,
       h6h = this.h6h, h6l = this.h6l, h7h = this.h7h, h7l = this.h7l,
-      blocks = this.blocks, j, s0h, s0l, s1h, s1l, c1, c2, c3, c4, 
+      blocks = this.blocks, j, s0h, s0l, s1h, s1l, c1, c2, c3, c4,
       abh, abl, dah, dal, cdh, cdl, bch, bcl,
       majh, majl, t1h, t1l, t2h, t2l, chh, chl;
 
@@ -582,7 +616,7 @@
     this.finalize();
 
     var h0h = this.h0h, h0l = this.h0l, h1h = this.h1h, h1l = this.h1l,
-      h2h = this.h2h, h2l = this.h2l, h3h = this.h3h, h3l = this.h3l, 
+      h2h = this.h2h, h2l = this.h2l, h3h = this.h3h, h3l = this.h3l,
       h4h = this.h4h, h4l = this.h4l, h5h = this.h5h, h5l = this.h5l,
       h6h = this.h6h, h6l = this.h6l, h7h = this.h7h, h7l = this.h7l,
       bits = this.bits;
@@ -666,7 +700,7 @@
     this.finalize();
 
     var h0h = this.h0h, h0l = this.h0l, h1h = this.h1h, h1l = this.h1l,
-      h2h = this.h2h, h2l = this.h2l, h3h = this.h3h, h3l = this.h3l, 
+      h2h = this.h2h, h2l = this.h2l, h3h = this.h3h, h3l = this.h3l,
       h4h = this.h4h, h4l = this.h4l, h5h = this.h5h, h5l = this.h5l,
       h6h = this.h6h, h6l = this.h6l, h7h = this.h7h, h7l = this.h7l,
       bits = this.bits;
