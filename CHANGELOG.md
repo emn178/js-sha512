@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.6.0 / 2017-10-31
+### Fixed
+- incorrect result when file size >= 512M.
+
 ## v0.5.0 / 2017-10-07
 ### Added
 - support for web worker. #5

@@ -1,6 +1,6 @@
 {
   "name": "js-sha512",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "main": ["src/sha512.js"],
   "ignore": [
     "samples",

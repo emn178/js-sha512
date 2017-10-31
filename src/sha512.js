@@ -1,7 +1,7 @@
 /*
  * [js-sha512]{@link https://github.com/emn178/js-sha512}
  *
- * @version 0.5.0
+ * @version 0.6.0
  * @author Chen, Yi-Cyuan [emn178@gmail.com]
  * @copyright Chen, Yi-Cyuan 2014-2017
  * @license MIT
@@ -195,7 +195,7 @@
     }
     this.bits = bits;
 
-    this.block = this.start = this.bytes = 0;
+    this.block = this.start = this.bytes = this.hBytes = 0;
     this.finalized = this.hashed = false;
   }
 
@@ -274,6 +274,10 @@
         this.start = i;
       }
     }
+    if (this.bytes > 4294967295) {
+      this.hBytes += this.bytes / 4294967296 << 0;
+      this.bytes = this.bytes % 4294967296;
+    }
     return this;
   };
 
@@ -300,6 +304,7 @@
       blocks[25] = blocks[26] = blocks[27] = blocks[28] =
       blocks[29] = blocks[30] = blocks[31] = blocks[32] = 0;
     }
+    blocks[30] = this.hBytes << 3 | this.bytes >> 29;
     blocks[31] = this.bytes << 3;
     this.hash();
   };
