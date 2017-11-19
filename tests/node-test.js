@@ -4,6 +4,7 @@ Worker = require('webworker-threads').Worker;
 function unset() {
   delete require.cache[require.resolve('../src/sha512.js')];
   delete require.cache[require.resolve('./test.js')];
+  delete require.cache[require.resolve('./hmac-test.js')];
   sha512 = null;
   sha384 = null;
   sha512_256 = null;
@@ -27,6 +28,7 @@ function requireToGlobal() {
 function runCommonJsTest() {
   requireToGlobal();
   require('./test.js');
+  require('./hmac-test.js');
   unset();
 }
 
@@ -34,6 +36,7 @@ function runWindowTest() {
   window = global;
   require('../src/sha512.js');
   require('./test.js');
+  require('./hmac-test.js');
   unset();
 }
 
@@ -74,6 +77,7 @@ define = function (func) {
   sha512_256 = sha512.sha512_256;
   sha512_224 = sha512.sha512_224;
   require('./test.js');
+  require('./hmac-test.js');
 };
 define.amd = true;
 

@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.7.0 / 2017-11-19
+### Added
+- support HMAC. #8
+
 ## v0.6.0 / 2017-10-31
 ### Fixed
 - incorrect result when file size >= 512M.

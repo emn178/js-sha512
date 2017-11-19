@@ -39,6 +39,18 @@ hash.hex();
 var hash2 = sha512.update('Message to hash');
 hash2.update('Message2 to hash');
 hash2.array();
+
+// HMAC
+sha512.hmac('key', 'Message to hash');
+sha384.hmac('key', 'Message to hash');
+
+var hash = sha512.hmac.create('key');
+hash.update('Message to hash');
+hash.hex();
+
+var hash2 = sha512.hmac.update('key', 'Message to hash');
+hash2.update('Message2 to hash');
+hash2.array();
 ```
 If you use node.js, you should require the module first:
 ```JavaScript
