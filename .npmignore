@@ -1,7 +1,7 @@
 /node_modules/
-/covreporter/
+/coverage/
+/.nyc_output/
 /tests/
-.covignore
 .travis.yml
 .npmignore
 bower.json

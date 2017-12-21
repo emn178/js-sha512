@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.7.1 / 2017-12-21
+### Fixed
+- incorrect result when first bit is 1 of bytes.
+
 ## v0.7.0 / 2017-11-19
 ### Added
 - support HMAC. #8

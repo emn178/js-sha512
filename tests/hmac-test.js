@@ -109,9 +109,21 @@
         'Hi There'
       ]
     };
+    testCases.sha512_hmac['Uint8Array'] = {
+      'f7688a104326d36c1940f6d28d746c0661d383e0d14fe8a04649444777610f5dd9565a36846ab9e9e734cf380d3a070d8ef021b5f3a50c481710a464968e3419': [
+        new Uint8Array(0),
+        'Hi There'
+      ]
+    };
     testCases.sha384_hmac['ArrayBuffer'] = {
       'da5393cef424a670d6db42c6ed6e7920779dfa4cbb98bf1c2e9c12ae10d10905d0c9e9d576c2a613be54b8daea246d4b': [
         new ArrayBuffer(0),
+        'Hi There'
+      ]
+    };
+    testCases.sha384_hmac['Uint8Array'] = {
+      'da5393cef424a670d6db42c6ed6e7920779dfa4cbb98bf1c2e9c12ae10d10905d0c9e9d576c2a613be54b8daea246d4b': [
+        new Uint8Array(0),
         'Hi There'
       ]
     };
