@@ -1,5 +1,13 @@
 # Change Log
 
+## v0.8.0 / 2018-08-05
+### Added
+- TypeScript definitions.
+- clone method.
+
+### Changed
+- throw error if update after finalize
+
 ## v0.7.1 / 2017-12-21
 ### Fixed
 - incorrect result when first bit is 1 of bytes.

@@ -5,6 +5,9 @@
 [![NPM](https://nodei.co/npm/js-sha512.png?stars&downloads)](https://nodei.co/npm/js-sha512/)  
 A simple SHA-512, SHA-384, SHA-512/224, SHA-512/256 hash functions for JavaScript supports UTF-8 encoding.
 
+## Notice
+* v0.8.0+ will throw an error if try to update hash after finalize.
+
 ## Demo
 [SHA512 Online](http://emn178.github.io/online-tools/sha512.html)  
 [SHA384 Online](http://emn178.github.io/online-tools/sha384.html)  
@@ -32,13 +35,29 @@ sha384('Message to hash');
 sha512_256('Message to hash');
 sha512_224('Message to hash');
 
+// Support ArrayBuffer output
+var arrayBuffer = sha512.arrayBuffer('Message to hash');
+
+// Support Array output
+var bytes = sha512.digest('Message to hash');
+var bytes = sha512.array('Message to hash');
+
+// update hash
+var hash = sha512.update('Message to hash');
+hash.update('Message2 to hash');
+hash.hex();
+
+// or to use create
 var hash = sha512.create();
 hash.update('Message to hash');
 hash.hex();
 
-var hash2 = sha512.update('Message to hash');
-hash2.update('Message2 to hash');
-hash2.array();
+// clone
+var hash = sha512.update('Message to hash');
+var hash2 = hash.clone();
+hash2.hex();
+hash.update('Message2 to hash');
+hash.hex();
 
 // HMAC
 sha512.hmac('key', 'Message to hash');

@@ -203,8 +203,17 @@
         call: function (key, message) {
           var hash = algorithm.update(key, message);
           hash.hex();
-          hash.update(message);
+          hash.finalize();
           return hash.hex();
+        }
+      },
+      {
+        name: 'clone',
+        call: function (key, message) {
+          var hash = algorithm.update(key, message);
+          var hash2 = hash.clone();
+          hash.update('any');
+          return hash2.hex();
         }
       }
     ];
@@ -247,6 +256,16 @@
               });
             })(testCaseName);
           }
+        });
+      });
+
+      context('when update after finalize', function () {
+        it('should throw error', function () {
+          expect(function () {
+            var hash = algorithm.update('key', 'any');
+            hash.hex();
+            hash.update('any');
+          }).to.throwError(/finalize already called/);
         });
       });
 

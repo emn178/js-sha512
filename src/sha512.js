@@ -1,16 +1,17 @@
 /*
  * [js-sha512]{@link https://github.com/emn178/js-sha512}
  *
- * @version 0.7.1
+ * @version 0.8.0
  * @author Chen, Yi-Cyuan [emn178@gmail.com]
- * @copyright Chen, Yi-Cyuan 2014-2017
+ * @copyright Chen, Yi-Cyuan 2014-2018
  * @license MIT
  */
 /*jslint bitwise: true */
 (function () {
   'use strict';
 
-  var ERROR = 'input is invalid type';
+  var INPUT_ERROR = 'input is invalid type';
+  var FINALIZE_ERROR = 'finalize already called';
   var WINDOW = typeof window === 'object';
   var root = WINDOW ? window : {};
   if (root.JS_SHA512_NO_WINDOW) {
@@ -222,22 +223,22 @@
 
   Sha512.prototype.update = function (message) {
     if (this.finalized) {
-      return;
+      throw new Error(FINALIZE_ERROR);
     }
     var notString, type = typeof message;
     if (type !== 'string') {
       if (type === 'object') {
         if (message === null) {
-          throw ERROR;
+          throw new Error(INPUT_ERROR);
         } else if (ARRAY_BUFFER && message.constructor === ArrayBuffer) {
           message = new Uint8Array(message);
         } else if (!Array.isArray(message)) {
           if (!ARRAY_BUFFER || !ArrayBuffer.isView(message)) {
-            throw ERROR;
+            throw new Error(INPUT_ERROR);
           }
         }
       } else {
-        throw ERROR;
+        throw new Error(INPUT_ERROR);
       }
       notString = true;
     }
@@ -796,21 +797,40 @@
     return buffer;
   };
 
+  Sha512.prototype.clone = function () {
+    var hash = new Sha512(this.bits, false);
+    this.copyTo(hash);
+    return hash;
+  };
+
+  Sha512.prototype.copyTo = function (hash) {
+    var i = 0, attrs = [
+      'h0h', 'h0l', 'h1h', 'h1l', 'h2h', 'h2l', 'h3h', 'h3l', 'h4h', 'h4l', 'h5h', 'h5l', 'h6h', 'h6l', 'h7h', 'h7l',
+      'start', 'bytes', 'hBytes', 'finalized', 'hashed', 'lastByteIndex'
+    ];
+    for (i = 0; i < attrs.length; ++i) {
+      hash[attrs[i]] = this[attrs[i]];
+    }
+    for (i = 0; i < this.blocks.length; ++i) {
+      hash.blocks[i] = this.blocks[i];
+    }
+  };
+
   function HmacSha512(key, bits, sharedMemory) {
     var notString, type = typeof key;
     if (type !== 'string') {
       if (type === 'object') {
         if (key === null) {
-          throw ERROR;
+          throw new Error(INPUT_ERROR);
         } else if (ARRAY_BUFFER && key.constructor === ArrayBuffer) {
           key = new Uint8Array(key);
         } else if (!Array.isArray(key)) {
           if (!ARRAY_BUFFER || !ArrayBuffer.isView(key)) {
-            throw ERROR;
+            throw new Error(INPUT_ERROR);
           }
         }
       } else {
-        throw ERROR;
+        throw new Error(INPUT_ERROR);
       }
       notString = true;
     }
@@ -869,6 +889,16 @@
       this.update(innerHash);
       Sha512.prototype.finalize.call(this);
     }
+  };
+
+  HmacSha512.prototype.clone = function () {
+    var hash = new HmacSha512([], this.bits, false);
+    this.copyTo(hash);
+    hash.inner = this.inner;
+    for (var i = 0; i < this.oKeyPad.length; ++i) {
+      hash.oKeyPad[i] = this.oKeyPad[i];
+    }
+    return hash;
   };
 
   var exports = createMethod(512);
