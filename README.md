@@ -112,9 +112,12 @@ sha512_224('中文'); // 0f46a0ae7f226517dd66ece0ce1efa29ffb7ced05ac4566fdcaed18
 // Different output
 sha512(''); // cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
 sha512.hex(''); // cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
+sha512.hexBase64(''); // Y2Y4M2UxMzU3ZWVmYjhiZGYxNTQyODUwZDY2ZDgwMDdkNjIwZTQwNTBiNTcxNWRjODNmNGE5MjFkMzZjZTljZTQ3ZDBkMTNjNWQ4NWYyYjBmZjgzMThkMjg3N2VlYzJmNjNiOTMxYmQ0NzQxN2E4MWE1MzgzMjdhZjkyN2RhM2U=
 sha512.array(''); // [207, 131, 225, 53, 126, 239, 184, 189, 241, 84, 40, 80, 214, 109, 128, 7, 214, 32, 228, 5, 11, 87, 21, 220, 131, 244, 169, 33, 211, 108, 233, 206, 71, 208, 209, 60, 93, 133, 242, 176, 255, 131, 24, 210, 135, 126, 236, 47, 99, 185, 49, 189, 71, 65, 122, 129, 165, 56, 50, 122, 249, 39, 218, 62]
 sha512.digest(''); // [207, 131, 225, 53, 126, 239, 184, 189, 241, 84, 40, 80, 214, 109, 128, 7, 214, 32, 228, 5, 11, 87, 21, 220, 131, 244, 169, 33, 211, 108, 233, 206, 71, 208, 209, 60, 93, 133, 242, 176, 255, 131, 24, 210, 135, 126, 236, 47, 99, 185, 49, 189, 71, 65, 122, 129, 165, 56, 50, 122, 249, 39, 218, 62]
 sha512.arrayBuffer(''); // ArrayBuffer
+sha512.binary(''); // Ï�á5~ï¸½ñT(PÖm��Ö ä��W�Ü�ô©!ÓléÎGÐÑ<]�ò°ÿ��Ò�~ì/c¹1½GAz�¥82zù'Ú>
+sha512.binaryBase64(''); // z4PhNX7vuL3xVChQ1m2AB9Yg5AULVxXcg/SpIdNs6c5H0NE8XYXysP+DGNKHfuwvY7kxvUdBeoGlODJ6+SfaPg==
 ```
 
 ## License

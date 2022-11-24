@@ -73,7 +73,7 @@
     0x5FCB6FAB, 0x3AD6FAEC, 0x6C44198C, 0x4A475817
   ];
 
-  var OUTPUT_TYPES = ['hex', 'array', 'digest', 'arrayBuffer'];
+  var OUTPUT_TYPES = ['hex', 'hexBase64', 'array', 'digest', 'arrayBuffer', 'binary', 'binaryBase64'];
 
   var blocks = [];
 
@@ -722,6 +722,10 @@
 
   Sha512.prototype.toString = Sha512.prototype.hex;
 
+  Sha512.prototype.hexBase64 = function () {
+    return btoa(this.hex());
+  };
+
   Sha512.prototype.digest = function () {
     this.finalize();
 
@@ -764,6 +768,18 @@
   };
 
   Sha512.prototype.array = Sha512.prototype.digest;
+
+  Sha512.prototype.binary = function () {
+    return this.digest()
+      .map(function (v) {
+        return String.fromCharCode(v);
+      })
+      .join('');
+  };
+
+  Sha512.prototype.binaryBase64 = function () {
+    return btoa(this.binary());
+  };
 
   Sha512.prototype.arrayBuffer = function () {
     this.finalize();
