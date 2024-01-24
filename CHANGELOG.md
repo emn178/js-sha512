@@ -1,5 +1,15 @@
 # Change Log
 
+## v0.9.0 / 2024-01-24
+### Fixed
+- dependencies and security issues.
+- don't modify global Array and ArrayBuffer prototypes.
+- refactor: simplify formatMessage internal logic.
+- Generates incorrect hash in some cases.
+
+### Changed
+- use unsigned right shift.
+
 ## v0.8.0 / 2018-08-05
 ### Added
 - TypeScript definitions.

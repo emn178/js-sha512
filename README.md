@@ -28,6 +28,36 @@ For node.js, you can use this command to install:
     npm install js-sha512
 
 ## Usage
+### Node.js
+If you use node.js, you should require the module first:
+```JavaScript
+const { sha512, sha384, sha512_256, sha512_224 } = require('js-sha512');
+```
+
+### TypeScript
+If you use TypeScript, you can import like this:
+```TypeScript
+import { sha512, sha384, sha512_256, sha512_224 } from 'js-sha512';
+```
+
+### RequireJS
+It supports AMD:
+```JavaScript
+require(['your/path/sha512.js'], function(jsSha512) {
+  const { sha512, sha384, sha512_256, sha512_224 } = jsSha512;
+});
+```
+
+### Classic Browser
+If you use browser script directly, functions will be global:
+```JavaScript
+sha512('Message to hash');
+sha384('Message to hash');
+sha512_256('Message to hash');
+sha512_224('Message to hash');
+```
+
+## Example
 You could use like this:
 ```JavaScript
 sha512('Message to hash');
@@ -70,26 +100,7 @@ hash.hex();
 var hash2 = sha512.hmac.update('key', 'Message to hash');
 hash2.update('Message2 to hash');
 hash2.array();
-```
-If you use node.js, you should require the module first:
-```JavaScript
-var sha512 = require('js-sha512');
-```
-or 
-```JavaScript
-var sha512 = require('js-sha512').sha512;
-var sha384 = require('js-sha512').sha384;
-var sha512_256 = require('js-sha512').sha512_256;
-var sha512_224 = require('js-sha512').sha512_224;
-```
-It supports AMD:
-```JavaScript
-require(['your/path/sha512.js'], function(sha512) {
-// ...
-});
-```
-## Example
-```JavaScript
+
 sha512(''); // cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
 sha512('The quick brown fox jumps over the lazy dog'); // 07e547d9586f6a73f73fbac0435ed76951218fb7d0c8d788a309d785436bbb642e93a252a954f23912547d1e8a3b5ed6e1bfd7097821233fa0538f3db854fee6
 sha512('The quick brown fox jumps over the lazy dog.'); // 91ea1245f20d46ae9a037a989f54f1f790f0a47607eeb8a14d12890cea77a1bbc6c7ed9cf205e67b7f2b8fd4c7dfd3a7a8617e45f3c463d481c7e586c39ac1ed
@@ -115,6 +126,10 @@ sha512.hex(''); // cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce
 sha512.array(''); // [207, 131, 225, 53, 126, 239, 184, 189, 241, 84, 40, 80, 214, 109, 128, 7, 214, 32, 228, 5, 11, 87, 21, 220, 131, 244, 169, 33, 211, 108, 233, 206, 71, 208, 209, 60, 93, 133, 242, 176, 255, 131, 24, 210, 135, 126, 236, 47, 99, 185, 49, 189, 71, 65, 122, 129, 165, 56, 50, 122, 249, 39, 218, 62]
 sha512.digest(''); // [207, 131, 225, 53, 126, 239, 184, 189, 241, 84, 40, 80, 214, 109, 128, 7, 214, 32, 228, 5, 11, 87, 21, 220, 131, 244, 169, 33, 211, 108, 233, 206, 71, 208, 209, 60, 93, 133, 242, 176, 255, 131, 24, 210, 135, 126, 236, 47, 99, 185, 49, 189, 71, 65, 122, 129, 165, 56, 50, 122, 249, 39, 218, 62]
 sha512.arrayBuffer(''); // ArrayBuffer
+
+// HMAC
+sha512.hmac.hex('key', 'Message to hash');
+sha512.hmac.array('key', 'Message to hash');
 ```
 
 ## License

@@ -1,18 +1,18 @@
 {
   "name": "js-sha512",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "This is a simple SHA-512, SHA-384, SHA-512/224, SHA-512/256 hash functions for JavaScript supports UTF-8 encoding.",
   "main": "src/sha512.js",
   "devDependencies": {
     "expect.js": "~0.3.1",
-    "mocha": "~5.2.0",
-    "nyc": "^11.3.0",
+    "mocha": "~10.2.0",
+    "nyc": "^15.1.0",
     "requirejs": "^2.1.22",
-    "uglify-js": "^3.1.9",
-    "webworker-threads": "^0.7.11"
+    "tiny-worker": "^2.3.0",
+    "uglify-js": "^3.1.9"
   },
   "scripts": {
-    "test": "nyc mocha tests/node-test.js --exit",
+    "test": "nyc mocha tests/node-test.js",
     "report": "nyc --reporter=html --reporter=text mocha tests/node-test.js --exit",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "build": "uglifyjs src/sha512.js -c -m eval --comments -o build/sha512.min.js"
