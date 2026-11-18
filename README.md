@@ -1,18 +1,19 @@
 # js-sha512
-[![Build Status](https://travis-ci.org/emn178/js-sha512.svg?branch=master)](https://travis-ci.org/emn178/js-sha512)
+[![CI](https://github.com/emn178/js-sha512/actions/workflows/ci.yml/badge.svg)](https://github.com/emn178/js-sha512/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/emn178/js-sha512/badge.svg?branch=master)](https://coveralls.io/r/emn178/js-sha512?branch=master)
-[![CDNJS](https://img.shields.io/cdnjs/v/js-sha512.svg)](https://cdnjs.com/libraries/js-sha512/)  
-[![NPM](https://nodei.co/npm/js-sha512.png?stars&downloads)](https://nodei.co/npm/js-sha512/)  
+[![NPM](https://img.shields.io/npm/v/js-sha512)](https://www.npmjs.com/package/js-sha512)
+[![CDNJS](https://img.shields.io/jsdelivr/npm/hm/js-sha512)](https://www.jsdelivr.com/package/npm/js-sha512)
+
 A simple SHA-512, SHA-384, SHA-512/224, SHA-512/256 hash functions for JavaScript supports UTF-8 encoding.
 
 ## Notice
 * v0.8.0+ will throw an error if try to update hash after finalize.
 
 ## Demo
-[SHA512 Online](http://emn178.github.io/online-tools/sha512.html)  
-[SHA384 Online](http://emn178.github.io/online-tools/sha384.html)  
-[SHA512/256 Online](http://emn178.github.io/online-tools/sha512_256.html)  
-[SHA512/224 Online](http://emn178.github.io/online-tools/sha512_224.html)  
+[SHA512 Online](https://emn178.github.io/online-tools/sha512.html)  
+[SHA384 Online](https://emn178.github.io/online-tools/sha384.html)  
+[SHA512/256 Online](https://emn178.github.io/online-tools/sha512_256.html)  
+[SHA512/224 Online](https://emn178.github.io/online-tools/sha512_224.html)  
 
 ## Download
 [Compress](https://raw.github.com/emn178/js-sha512/master/build/sha512.min.js)  
@@ -32,6 +33,21 @@ For node.js, you can use this command to install:
 If you use node.js, you should require the module first:
 ```JavaScript
 const { sha512, sha384, sha512_256, sha512_224 } = require('js-sha512');
+```
+
+### ESM
+If you use node.js ESM or a bundler, you can import like this:
+```JavaScript
+import { sha512, sha384, sha512_256, sha512_224 } from 'js-sha512';
+// or
+import sha512 from 'js-sha512';
+```
+
+In browsers, you can import the ESM build directly:
+```HTML
+<script type="module">
+  import { sha512 } from 'https://cdn.jsdelivr.net/npm/js-sha512/build/sha512.min.mjs';
+</script>
 ```
 
 ### TypeScript
@@ -120,6 +136,13 @@ sha384('中文'); // 93422ceb8291a69b22f02dc1114c39a287493ad525dcebc77e4019a44ea
 sha512_256('中文'); // b6dab29c16ec35ab34a5d92ff135b58de96741dda78b1009a2181cf8b45d2f72
 sha512_224('中文'); // 0f46a0ae7f226517dd66ece0ce1efa29ffb7ced05ac4566fdcaed188
 
+// Unpaired surrogates are encoded as U+FFFD, the same as TextEncoder
+sha512('\ud800'); // 7d59b7409d1bbb5a95488e1aecb317fba794ab5ab2c2c8e8f8aa00efc9c94a03ccae8884472d53e40d7c46727b1d07c71bf5c741e4215a5d5a076e23adc2d87e
+
+// It also supports byte `Array`, `Uint8Array`, `ArrayBuffer` and other `ArrayBuffer` views
+sha512([]); // cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
+sha512(new Uint8Array([])); // cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
+
 // Different output
 sha512(''); // cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
 sha512.hex(''); // cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
@@ -133,7 +156,7 @@ sha512.hmac.array('key', 'Message to hash');
 ```
 
 ## License
-The project is released under the [MIT license](http://www.opensource.org/licenses/MIT).
+The project is released under the [MIT license](https://opensource.org/license/mit/).
 
 ## Contact
 The project's website is located at https://github.com/emn178/js-sha512  

@@ -1,9 +1,9 @@
 /*
  * [js-sha512]{@link https://github.com/emn178/js-sha512}
  *
- * @version 0.9.0
+ * @version 0.10.0
  * @author Chen, Yi-Cyuan [emn178@gmail.com]
- * @copyright Chen, Yi-Cyuan 2014-2024
+ * @copyright Chen, Yi-Cyuan 2014-2026
  * @license MIT
  */
 /*jslint bitwise: true */
@@ -18,7 +18,7 @@
     WINDOW = false;
   }
   var WEB_WORKER = !WINDOW && typeof self === 'object';
-  var NODE_JS = !root.JS_SHA512_NO_NODE_JS && typeof process === 'object' && process.versions && process.versions.node;
+  var NODE_JS = !root.JS_SHA512_NO_NODE_JS && !WINDOW && typeof process === 'object' && process.versions && process.versions.node && process.type != 'renderer';
   if (NODE_JS) {
     root = global;
   } else if (WEB_WORKER) {
@@ -84,7 +84,7 @@
     };
   }
 
-  var isView = ArrayBuffer.isView;
+  var isView = ARRAY_BUFFER ? ArrayBuffer.isView : null;
   if (ARRAY_BUFFER && (root.JS_SHA512_NO_ARRAY_BUFFER_IS_VIEW || !isView)) {
     isView = function (obj) {
       return typeof obj === 'object' && obj.buffer && obj.buffer.constructor === ArrayBuffer;
@@ -103,11 +103,15 @@
     if (ARRAY_BUFFER && message.constructor === ArrayBuffer) {
       return [new Uint8Array(message), false];
     }
-    if (!isArray(message) && !isView(message)) {
+    if (isArray(message)) {
+      return [message, false];
+    }
+    if (!ARRAY_BUFFER || !isView(message)) {
       throw new Error(INPUT_ERROR);
     }
-    return [message, false];
-  }
+    // read the underlying bytes of any view (Int8Array, DataView, Uint16Array, ...)
+    return [new Uint8Array(message.buffer, message.byteOffset, message.byteLength), false];
+  };
 
   var createOutputMethod = function (outputType, bits) {
     return function (message) {
@@ -248,7 +252,7 @@
     var result = formatMessage(message);
     message = result[0];
     var isString = result[1];
-    var code, index = 0, i, length = message.length, blocks = this.blocks;
+    var code, code2, index = 0, i, length = message.length, blocks = this.blocks;
 
     while (index < length) {
       if (this.hashed) {
@@ -276,12 +280,18 @@
             blocks[i >>> 2] |= (0xe0 | (code >>> 12)) << SHIFT[i++ & 3];
             blocks[i >>> 2] |= (0x80 | ((code >>> 6) & 0x3f)) << SHIFT[i++ & 3];
             blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
-          } else {
-            code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
+          } else if (code < 0xdc00 && (code2 = message.charCodeAt(index + 1)) >= 0xdc00 && code2 < 0xe000) {
+            ++index;
+            code = 0x10000 + (((code & 0x3ff) << 10) | (code2 & 0x3ff));
             blocks[i >>> 2] |= (0xf0 | (code >>> 18)) << SHIFT[i++ & 3];
             blocks[i >>> 2] |= (0x80 | ((code >>> 12) & 0x3f)) << SHIFT[i++ & 3];
             blocks[i >>> 2] |= (0x80 | ((code >>> 6) & 0x3f)) << SHIFT[i++ & 3];
             blocks[i >>> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+          } else {
+            // unpaired surrogate: U+FFFD
+            blocks[i >>> 2] |= 0xef << SHIFT[i++ & 3];
+            blocks[i >>> 2] |= 0xbf << SHIFT[i++ & 3];
+            blocks[i >>> 2] |= 0xbd << SHIFT[i++ & 3];
           }
         }
       } else {
@@ -812,7 +822,7 @@
   Sha512.prototype.copyTo = function (hash) {
     var i = 0, attrs = [
       'h0h', 'h0l', 'h1h', 'h1l', 'h2h', 'h2l', 'h3h', 'h3l', 'h4h', 'h4l', 'h5h', 'h5l', 'h6h', 'h6l', 'h7h', 'h7l',
-      'start', 'bytes', 'hBytes', 'finalized', 'hashed', 'lastByteIndex'
+      'block', 'start', 'bytes', 'hBytes', 'finalized', 'hashed', 'lastByteIndex'
     ];
     for (i = 0; i < attrs.length; ++i) {
       hash[attrs[i]] = this[attrs[i]];
@@ -826,8 +836,8 @@
     var i, result = formatMessage(key);
     key = result[0];
     if (result[1]) {
-      var bytes = [], length = key.length, index = 0, code;
-      for (var i = 0; i < length; ++i) {
+      var bytes = [], length = key.length, index = 0, code, code2;
+      for (i = 0; i < length; ++i) {
         code = key.charCodeAt(i);
         if (code < 0x80) {
           bytes[index++] = code;
@@ -838,12 +848,18 @@
           bytes[index++] = (0xe0 | (code >>> 12));
           bytes[index++] = (0x80 | ((code >>> 6) & 0x3f));
           bytes[index++] = (0x80 | (code & 0x3f));
-        } else {
-          code = 0x10000 + (((code & 0x3ff) << 10) | (key.charCodeAt(++i) & 0x3ff));
+        } else if (code < 0xdc00 && (code2 = key.charCodeAt(i + 1)) >= 0xdc00 && code2 < 0xe000) {
+          ++i;
+          code = 0x10000 + (((code & 0x3ff) << 10) | (code2 & 0x3ff));
           bytes[index++] = (0xf0 | (code >>> 18));
           bytes[index++] = (0x80 | ((code >>> 12) & 0x3f));
           bytes[index++] = (0x80 | ((code >>> 6) & 0x3f));
           bytes[index++] = (0x80 | (code & 0x3f));
+        } else {
+          // unpaired surrogate: U+FFFD
+          bytes[index++] = 0xef;
+          bytes[index++] = 0xbf;
+          bytes[index++] = 0xbd;
         }
       }
       key = bytes;
@@ -854,7 +870,7 @@
     }
 
     var oKeyPad = [], iKeyPad = [];
-    for (var i = 0; i < 128; ++i) {
+    for (i = 0; i < 128; ++i) {
       var b = key[i] || 0;
       oKeyPad[i] = 0x5c ^ b;
       iKeyPad[i] = 0x36 ^ b;

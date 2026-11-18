@@ -16,6 +16,7 @@ function unset() {
   JS_SHA512_NO_ARRAY_BUFFER = undefined;
   JS_SHA512_NO_ARRAY_BUFFER_IS_VIEW = undefined;
   window = undefined;
+  self = undefined;
 }
 
 function requireToGlobal() {
@@ -84,6 +85,18 @@ define.amd = true;
 require('../src/sha512.js');
 unset();
 
+// browser with a process polyfill (e.g. BrowserFS)
+window = global;
+runCommonJsTest();
+
+// Electron renderer
+process.type = 'renderer';
+requireToGlobal();
+delete process.type;
+require('./test.js');
+require('./hmac-test.js');
+unset();
+
 // webworker
 WORKER = 'tests/worker.js';
 SOURCE = 'src/sha512.js';
@@ -117,3 +130,50 @@ importScripts = function () {};
 
 requireToGlobal();
 require('./worker-test.js');
+
+// environment detection in isolated contexts (no Node.js globals)
+describe('environment detection', function () {
+  var vm = require('vm');
+  var fs = require('fs');
+  var path = require('path');
+  var source = fs.readFileSync(path.join(__dirname, '../src/sha512.js'), 'utf8');
+
+  function run(sandbox, script) {
+    var context = vm.createContext(sandbox);
+    if (script) {
+      vm.runInContext(script, context);
+    }
+    vm.runInContext(source, context);
+    return sandbox;
+  }
+
+  function check(sandbox) {
+    expect(sandbox.sha512('abc')).to.be('ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f');
+    expect(sandbox.sha384('abc')).to.be('cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7');
+    expect(sandbox.sha512.hmac('key', 'abc')).to.be(sandbox.sha512.hmac([107, 101, 121], [97, 98, 99]));
+  }
+
+  it('should not treat a browser with a process polyfill as Node.js', function () {
+    var sandbox = { process: { versions: { node: '18.0.0' }, env: {} } };
+    sandbox.window = sandbox.self = sandbox;
+    check(run(sandbox));
+  });
+
+  it('should not treat an Electron renderer as Node.js', function () {
+    var sandbox = { process: { type: 'renderer', versions: { node: '20.0.0' } } };
+    sandbox.window = sandbox.self = sandbox;
+    check(run(sandbox));
+  });
+
+  it('should expose to the global scope in a web worker', function () {
+    var sandbox = {};
+    sandbox.self = sandbox;
+    check(run(sandbox));
+  });
+
+  it('should load in a browser without ArrayBuffer', function () {
+    var sandbox = {};
+    sandbox.window = sandbox;
+    check(run(sandbox, 'delete ArrayBuffer; delete Uint8Array; delete DataView;'));
+  });
+});

@@ -187,7 +187,113 @@
     };
   }
 
+  testCases.sha512['UTF8 unpaired surrogates'] = {
+    '7d59b7409d1bbb5a95488e1aecb317fba794ab5ab2c2c8e8f8aa00efc9c94a03ccae8884472d53e40d7c46727b1d07c71bf5c741e4215a5d5a076e23adc2d87e': '\ud800',
+    '4d7fdee3b9f28d2289f1db90ee2ccab287d70a099bb4e91d255687a9971b58d343ebcf824b75e79909823244c7ccded8f22b41c3699b3bb531bcc0ae44ae2a2a': 'a\ud83db',
+    '641aad781cc13694609943dba776c39ffe16ed9a253680e78aae3a462b68e4209517e8a765012cb7d4b6affd1ba65f3d3fd2bb21647e7e30023647160be12115': '\ud83d\ud83d\ude00\udfff',
+    '152a01169805f03f8f9c0e534780a8769c8d35a0d9be9299a13edd311859f41f06f21ba96df70233ddddc7dcd9a616a0a6dc5cb2b36323ad48fe7c66e8da1353': Array(128).join('a') + '\ud800b'
+  };
+  testCases.sha512['UTF8 across block boundary'] = {
+    'f5473326b3ff49988e132ba9129f7f4c130bea9be4be6b86d00c217c25aebf1e62eb084e3b25dbc07811724f456387a2df7c35ab6ef1e1928397c6db6842a563': Array(128).join('a') + 'é',
+    '6bedbba0740c50627468976a5e8c5be75dc82698631bd1d1e5417d1f572f68fb4b2efc58136c2c783049fb232ba5976380e52eba4a057f50c04293e4a7099db3': Array(127).join('a') + '中',
+    '5e7d1d5b92e48b21a6fdd910b9ea3da99bebf7d13b15622578aa97d89a9216d1fbe7bcef773041f25312b2ec950ae47d016fa6a6de53a904d4d467ceb9330bcb': Array(128).join('a') + '中',
+    '5286e5b80ae850c13bdad8507cc8a6443609e6ef101fb655fcc47ee8f33f856fc3f977925e40e27ef1f2db8aee3e3a6ea925838b4ed5a6b3f2914c2c64767c24': Array(126).join('a') + '𠜎',
+    'd3df270dc1db96d1b9b184e54974af47e2b69badf66ce9678088d10160577823011186660068c57eb003a25efb6244e6ae0f06406ec68cad458c138c41644b5d': Array(127).join('a') + '𠜎',
+    'adad7b4c0580a140da5da4942ec5db95d4933908fc020f568f1af4ab17af4c6ae2634a2c5c05da0cd08d0c586cfca145fcf89d1479bda7306b1151b28f0ebc9c': Array(128).join('a') + '𠜎'
+  };
+  testCases.sha384['UTF8 unpaired surrogates'] = {
+    '662bfffbe42f38b8ac82029816a5c1bf51a505c32b19fb90aa21c83a59ef8f4b7b41e72c5c2966bdf2926f00e16d9df8': '\ud800',
+    '1b24a914be7fb0909203757fe7132d45dd0e4c4da229b97a8f620c9a8c0b1759075f58dc45232bde557b7ef75436799e': 'a\ud83db',
+    '46c30927ac7ee643470297b812070d1e21522cd75e1caa604f7c75e238479d5a5f64d228323d165ee5fe2a51b49b8bb9': '\ud83d\ud83d\ude00\udfff',
+    'e2a9bebab952af26ca750c35d6ef8b27f166c8f17185bc592b86568b2c84782a6ec195841419a2c3c2b0a438ebf3a845': Array(128).join('a') + '\ud800b'
+  };
+  testCases.sha384['UTF8 across block boundary'] = {
+    '722b1af5a8556bf8aaca6d3d80e5c6a0c602e15e97cf94818637db3578e8c66bc280d76026a5ea5065e66abd7c037639': Array(128).join('a') + 'é',
+    '156e3df3dfdb5c8973d00f8b5b0d4b70ddcb1569aa001dc8df99433c71cc4c1a303263ce4c77f9406be312adbb76a88b': Array(127).join('a') + '中',
+    'bd47172201ffe3c94bbc485725f985f13dd1fc60140c34d8888bc7af6fb35d90f8d08c9f908be3f3ad92aa53588da1ca': Array(128).join('a') + '中',
+    '67cff1351529845dd4694dc06d211594183c26e467fa64de922ae0f317f8fa2b252711517561729537d051cb10f72314': Array(126).join('a') + '𠜎',
+    '28d32f121407f9c77ee9f6bc303e4e6f86916b67f5612fe33aba0f10878368c447aa6c417aa738d9412c929638deb16f': Array(127).join('a') + '𠜎',
+    '6905d3234121e09535ee93883e191d44d81438e407a42cf18808291d5328e4f000fd62afc746f49369afedc3188c6337': Array(128).join('a') + '𠜎'
+  };
+  testCases.sha512_256['UTF8 unpaired surrogates'] = {
+    '22c873668c8155ae26ca3115eb5cccb3b314e50cba0bc9ab38c897e41693f280': '\ud800',
+    '50e6b13ccf27b8e9009d9d011855e0bdc24edd302b21b3d601a29d44800df27e': 'a\ud83db',
+    '085b9e8ac8f7200d252635e20f802b5c487293bec8e74b08b83810b52dd603bf': '\ud83d\ud83d\ude00\udfff',
+    'b959421a029397d0c774c3ac43d82ad30c960fbf9b1dcaf9a462ad7cce140244': Array(128).join('a') + '\ud800b'
+  };
+  testCases.sha512_256['UTF8 across block boundary'] = {
+    'c9a126db9a4e30a1ca13a8eab58fb7da7a0fe0a170ccbbee7e00aa2fe8b2ecb9': Array(128).join('a') + 'é',
+    '17013b4f01b74160c67523cee7e8d7dad07c0066512169b04a7982a7d0b1575c': Array(127).join('a') + '中',
+    '246a43155c67088eda8b1a4837c62b0c22e73d71debf977cc2b6058050ef429b': Array(128).join('a') + '中',
+    'f074b6bb1d4f018dbea707cf82b58af2785c17e8ce765d5f944dd3be912df81d': Array(126).join('a') + '𠜎',
+    '1f945e41fda9ec9b25ca3379d22f0d5a2198aee369ece7ae13bddd993bc63578': Array(127).join('a') + '𠜎',
+    '31c1e838cf1f9e1e14e800efac87094e42a1529a8a0ffbcd7d46f35adb0e130e': Array(128).join('a') + '𠜎'
+  };
+  testCases.sha512_224['UTF8 unpaired surrogates'] = {
+    '42229b02ef923428c65760abf1ca123ceade920daf39545132ad3a56': '\ud800',
+    '8f3dabf17609437aea7905afce7aaaae0ed617ef4e9121e1de5acb7e': 'a\ud83db',
+    'd8038808ed35eaba2b3ab9ef4ecec7ac9d246869fe200d18d63c5a7e': '\ud83d\ud83d\ude00\udfff',
+    '60868f7e12321094d2f90f6c88617d8fea478c769ffc3c9212554c75': Array(128).join('a') + '\ud800b'
+  };
+  testCases.sha512_224['UTF8 across block boundary'] = {
+    '808911cbe9a128393d903ec2220ffc3b318f2a77e9b0a2e8523caa8f': Array(128).join('a') + 'é',
+    '23a8fc62db1604c1c5b2d23d2f807bf3ec592f69fcdf56e5c51f70e9': Array(127).join('a') + '中',
+    '5b496b1937cc14b4bb6c6677090318a8b6208e67d39fecfa70ec0588': Array(128).join('a') + '中',
+    'd1817c54c8e95f71831863e7c82cca14666e75f30438fc75e74aff6d': Array(126).join('a') + '𠜎',
+    '7eb33da3668966a1b4a63f289ee93f36f0a0dcabe30f0b54133af48a': Array(127).join('a') + '𠜎',
+    '035c10dc775cb636add303757843640e247e8946a221c1bfd5a2426b': Array(128).join('a') + '𠜎'
+  };
+
+  if (!(typeof JS_SHA512_NO_ARRAY_BUFFER === 'boolean' && JS_SHA512_NO_ARRAY_BUFFER)) {
+    testCases.sha512['ArrayBuffer view'] = {
+      '96320ef62f00db5b54109915df45df70d44dd1ecda6a3b7d044d36df556b67f04bc1d07df1a3f528991a988b37116cea2e49987ca3b74b6d3c77ad13130089e4': new Int8Array([-1, -128, 127, 0, -2]),
+      '0ea99ce81968900213ec53ef5f6207e5b2f55774816f02fe33d2a07fff71fb918a064b3541d75ca036c4d08158a0ddaf68a2468493b0c0394f43058a7b31e264': new Uint16Array(new Uint8Array([2, 1]).buffer),
+      '33df2dcc31d35e7bc2568bebf5d73a1e43a0e624b651ba5ef3157bbfb728446674a231b8b6e97fa1e570c3b1de6d6c677541b262ac22afda5878fa2b591c7f08': new DataView(new Uint8Array([9, 72, 69, 76, 76, 79, 9]).buffer, 1, 5)
+    };
+    testCases.sha384['ArrayBuffer view'] = {
+      '8c298435ac64e95cc9d90bd8646a97f63fb31af9c436c0e7ae36f21e6f9abeaf2cf1aa97fa8824a0d0d8d003e9986722': new Int8Array([-1, -128, 127, 0, -2]),
+      '45a6f8ef0aacc113d35cce50c08f7e47724eb57b5d4455dca704a0e13b626432bd1f28f6733df1808af609f5620f848d': new Uint16Array(new Uint8Array([2, 1]).buffer),
+      '338ef44a9ff34626247ec1e36ea906ec09dad827cc3e931bcc090a76767a9f7c3131e7900eaf4ba34d3fa58f3e0559df': new DataView(new Uint8Array([9, 72, 69, 76, 76, 79, 9]).buffer, 1, 5)
+    };
+    testCases.sha512_256['ArrayBuffer view'] = {
+      '7a5b7bf2e9fbac7fad9aa692bfb440ef4143a8b1def39c87f375cc2935d1fb71': new Int8Array([-1, -128, 127, 0, -2]),
+      '6fde0f18e202ebaa5a25064690f26b17410cf9a60fa9d179b3eb30dfcc453a2c': new Uint16Array(new Uint8Array([2, 1]).buffer),
+      '0ed40219244e2af09aa8c6a7f70c7a7461fa9fcf9d3cff689509cc8a2d0d8ce6': new DataView(new Uint8Array([9, 72, 69, 76, 76, 79, 9]).buffer, 1, 5)
+    };
+    testCases.sha512_224['ArrayBuffer view'] = {
+      '5836b7ad820dc45062f921a3621983acbc7b3f2adb91a7b3b352c8e3': new Int8Array([-1, -128, 127, 0, -2]),
+      '559eb4432c2a7fd5e6dfc93d6a392864f4ec0e203e56ce0bf783b4f7': new Uint16Array(new Uint8Array([2, 1]).buffer),
+      '49a0981de9ec617a4a64ed0a4757b3c4aaadf586394cb664a3c259e2': new DataView(new Uint8Array([9, 72, 69, 76, 76, 79, 9]).buffer, 1, 5)
+    };
+  }
+
   var errorTestCases = [null, undefined, { length: 0 }, 0, 1, false, true, NaN, Infinity, function () {}];
+
+  var SPLIT = {
+    'sha512': [
+      '255cce5dff95a9f919c23e23d1255d92ce0a38c4f8abf18ca43e3da9010188fde62d587229500ad224e2c2b6b2b65e384929305330204d981f943973c624d9ff',
+      '4d7fdee3b9f28d2289f1db90ee2ccab287d70a099bb4e91d255687a9971b58d343ebcf824b75e79909823244c7ccded8f22b41c3699b3bb531bcc0ae44ae2a2a'
+    ],
+    'sha384': [
+      '2cd8dc532e2c456c439c74e78545d71eb21a4ce38e7801b20dc5a22500bb4915cd411425bd7f82386bfda5c55a7a9107',
+      '1b24a914be7fb0909203757fe7132d45dd0e4c4da229b97a8f620c9a8c0b1759075f58dc45232bde557b7ef75436799e'
+    ],
+    'sha512_256': [
+      '7dbad8838f5f1e1d925185146de720beb22c3c8431204c66a3ec84a1b4eca2d4',
+      '50e6b13ccf27b8e9009d9d011855e0bdc24edd302b21b3d601a29d44800df27e'
+    ],
+    'sha512_224': [
+      '84661383e33a07df597b7c1e5382dd233fccda138a2fcef01da68fa1',
+      '8f3dabf17609437aea7905afce7aaaae0ed617ef4e9121e1de5acb7e'
+    ]
+  };
+
+  var CLONE = {
+    'sha512': '7e74aa295afb50e5f8d779e0a34d88186cf8f521227b33b039b0afb2f80756281535b483a3b1e8e124ae9998ee88e935c12ba35ff482d9449d0f84b67dd7d19c',
+    'sha384': 'c0a31cf864cc46832807090e035a0f95301b5de056fe2c0f80db34372a7dadbecd6b578eb84184c83691ad53ae6c5076',
+    'sha512_256': '35fc54b624dffb6d70cc897f6f1b4d5951fadbd9ca70c7909760d1b14de49429',
+    'sha512_224': 'a22338091a4d3a2d3c4ea4b55f0fc04c3af7f2c564d59a4817622ed9'
+  };
 
   function runTestCases(name, algorithm) {
     var methods = [
@@ -334,6 +440,20 @@
             hash.hex();
             hash.update('any');
           }).to.throwError(/finalize already called/);
+        });
+      });
+
+      context('when a surrogate pair is split across updates', function () {
+        it('should encode each unpaired half as U+FFFD', function () {
+          expect(algorithm.update('a\ud83d').update('\ude00b').hex()).to.be(SPLIT[name][0]);
+          expect(algorithm.update('a\ud83d').update('b').hex()).to.be(SPLIT[name][1]);
+        });
+      });
+
+      context('when clone after a character crosses the block boundary', function () {
+        it('should be equal', function () {
+          var hash = algorithm.update(Array(128).join('a') + '\u4e2d');
+          expect(hash.clone().update('xyz').hex()).to.be(CLONE[name]);
         });
       });
 

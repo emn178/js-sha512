@@ -1,5 +1,21 @@
 # Change Log
 
+## v0.10.0 / 2026-11-18
+### Added
+- ESM builds and package `exports`.
+- `ArrayBufferView` input and byte HMAC keys in TypeScript interfaces.
+
+### Fixed
+- Incorrect hash for strings with unpaired UTF-16 surrogates, in both messages and HMAC keys; they are now encoded as U+FFFD, the same as `TextEncoder`.
+- Incorrect hash for `ArrayBuffer` views other than `Uint8Array`, such as `Int8Array` with negative values, `DataView` and `Uint16Array`; their underlying bytes are now hashed.
+- `clone` returns an incorrect hash when a multi-byte character crosses a block boundary.
+- Throws `global is not defined` in browsers with a `process` polyfill (e.g. BrowserFS) and Electron renderers.
+- Throws `ArrayBuffer is not defined` in browsers without `ArrayBuffer`.
+
+### Changed
+- Replace Travis CI with GitHub Actions.
+- Update dev dependencies and fix security issues.
+
 ## v0.9.0 / 2024-01-24
 ### Fixed
 - dependencies and security issues.

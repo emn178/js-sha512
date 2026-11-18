@@ -129,6 +129,46 @@
     };
   }
 
+  testCases.sha512_hmac['UTF8 key with unpaired surrogates'] = {
+    'ea4e39eb8ae3687311551780d92bf4face007e2fd55ab291077d07cb1dd00305aead1e485090fd9c89c36340b9c76ec184a8c5b7a74bfc77d1dfcbbbf1077dda': ['\ud800', 'Hi There'],
+    '8642678049cd8ed3e40c7e6bbf5eed31c219a4997c03625603e948533dafe60ec02ade9fb8fb5470af6bd2a66fbcc52bf734ef11aa490cac26c20a409402d4d8': ['a\ud83db', 'Hi There'],
+    'c4ba2c4d33fac465ad5f9808dc5e248d0148f9bd80d7316a5dbde5d6e787edba72b3ebe613cadd1bc02effbc9231d1418eca61acec023408338deb1fd626438e': ['\ud83d\ude00', 'Hi There']
+  };
+  testCases.sha384_hmac['UTF8 key with unpaired surrogates'] = {
+    '94617bdf53388b3e6844268817c749df4b3541c7e2f73e42c25b03e5a384a763c65a54752d29005c131080fe2d56582b': ['\ud800', 'Hi There'],
+    '367fad6fbc7331682a91beac50e045df2689f70e7606cea866a8beceba30db1f15fab98bb597ac3cce730756b6718cbc': ['a\ud83db', 'Hi There'],
+    '35a349adc04e79669f25907697d6760bea50d4e04f84ccf1f9c2295d8e4eb5bc47e96f65010f87ace2f5db064913bf30': ['\ud83d\ude00', 'Hi There']
+  };
+  testCases.sha512_256_hmac['UTF8 key with unpaired surrogates'] = {
+    'efcfca4fff38a878a7988a183fb05c7339e8340ba24e060ac126ad1c4a2b71c0': ['\ud800', 'Hi There'],
+    '63b5158868daa8c2481e59010a01177e10ac972442b31210d36d655a1739712e': ['a\ud83db', 'Hi There'],
+    '1f21c1b5649c65e2690f8cf014910399f98913e6c661293b3667a9d520f78f58': ['\ud83d\ude00', 'Hi There']
+  };
+  testCases.sha512_224_hmac['UTF8 key with unpaired surrogates'] = {
+    '383e5ddcd00bea073b0b993e6de88c0ba1846955802ae5659a90b256': ['\ud800', 'Hi There'],
+    '2dc7eb8e3906c8f680eb47c37f87cacc1ca89946ff858cf4a8da100c': ['a\ud83db', 'Hi There'],
+    'da3a34b37add65e1f4f0517f62151253f059d6dc107a2e64fd02c96c': ['\ud83d\ude00', 'Hi There']
+  };
+
+  if (!(typeof JS_SHA512_NO_ARRAY_BUFFER === 'boolean' && JS_SHA512_NO_ARRAY_BUFFER)) {
+    testCases.sha512_hmac['ArrayBuffer view key'] = {
+      '0c63f958fc903699b8ccecb9737e0162284990e7a502f42a55e7993bceb6d55922f8ae2ff2e2fc5fb0c951948e6caa2043090640b1ac66dba3b76ea324194840': [new Int8Array([-1, -128, 127, 0, -2]), 'Hi There'],
+      '546b2e97aa498a590fb9f674cec9251a13d9e326988adce72df7a6d30b7029940414dabf1b14e0932185830c03abea69e8f879d6945eb03f733b05aee64ca895': [new DataView(new Uint8Array([9, 72, 69, 76, 76, 79, 9]).buffer, 1, 5), 'Hi There']
+    };
+    testCases.sha384_hmac['ArrayBuffer view key'] = {
+      '6fa37cd593a812bb387bdf01ecafaa31cf7b220a06099c1e51bec8f165106512e1cee127ea5e8c2e42dc884d91d71121': [new Int8Array([-1, -128, 127, 0, -2]), 'Hi There'],
+      '106c588c3dd44073d656172cbf6269c40300429322e32f905fc0c23fa6378a6736718c96459b1597b4bcea5d91c1c92e': [new DataView(new Uint8Array([9, 72, 69, 76, 76, 79, 9]).buffer, 1, 5), 'Hi There']
+    };
+    testCases.sha512_256_hmac['ArrayBuffer view key'] = {
+      '7a87140ec8ab64d342770a0bf8544ede972b3d78bb93e4329101ddfdb5192f6f': [new Int8Array([-1, -128, 127, 0, -2]), 'Hi There'],
+      '116c89ecd662178449c7f2ef02e402e23a8675e9f15c0a6dd5bb6b5d4077c810': [new DataView(new Uint8Array([9, 72, 69, 76, 76, 79, 9]).buffer, 1, 5), 'Hi There']
+    };
+    testCases.sha512_224_hmac['ArrayBuffer view key'] = {
+      '2b0da87d1b49ec32d2cb61cee5135a2f2d6822042bc27d7ed7294b4b': [new Int8Array([-1, -128, 127, 0, -2]), 'Hi There'],
+      '98320eb07d0e3bac687e9b9e2ebcf9d67dab274f1b6069565be1580c': [new DataView(new Uint8Array([9, 72, 69, 76, 76, 79, 9]).buffer, 1, 5), 'Hi There']
+    };
+  }
+
   var errorTestCases = [null, undefined, { length: 0 }, 0, 1, false, true, NaN, Infinity, function () {}];
 
   function runTestCases(name, algorithm) {
